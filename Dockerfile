@@ -9,4 +9,10 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
+COPY entrypoint.sh /entrypoint.sh
+
+RUN chmod 744 /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
