@@ -26,7 +26,9 @@ SECRET_KEY = getenv('SECRET')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getenv('DEBUG_MODE') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1']
+
+AUTH_USER_MODEL = 'usuarios.Usuario'
 
 
 # Application definition
