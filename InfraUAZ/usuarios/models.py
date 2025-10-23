@@ -36,7 +36,7 @@ class Denunciante(models.Model):
     id_denunciante = models.AutoField(primary_key=True)
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='denunciante')
 
-""" class Administrador(models.Model):
+class Administrador(models.Model):
     id_administrador = models.AutoField(primary_key=True)
-    usuario = models.OneToOneField() """
-
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='administrador')
+    programa_academico = models.OneToOneField('denuncias.ProgramaAcademico', on_delete=models.RESTRICT)
