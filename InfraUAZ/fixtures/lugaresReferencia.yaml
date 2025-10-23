@@ -1,0 +1,160 @@
+- model: denuncias.LugarReferencia
+  pk: 1
+  fields:
+    nombre_lugar: "Salón 1"
+    id_tipo: 2
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 2
+  fields:
+    nombre_lugar: "Salón 2"
+    id_tipo: 2
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 3
+  fields:
+    nombre_lugar: "Salón 3"
+    id_tipo: 2
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 4
+  fields:
+    nombre_lugar: "Salón 4"
+    id_tipo: 2
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 5
+  fields:
+    nombre_lugar: "Salón 5"
+    id_tipo: 2
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 6
+  fields:
+    nombre_lugar: "Salón 6"
+    id_tipo: 2
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 7
+  fields:
+    nombre_lugar: "Salón 7"
+    id_tipo: 2
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 8
+  fields:
+    nombre_lugar: "Salón 8"
+    id_tipo: 2
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 9
+  fields:
+    nombre_lugar: "Salón 9"
+    id_tipo: 2
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 10
+  fields:
+    nombre_lugar: "Salón 10"
+    id_tipo: 2
+    id_programa: 3
+
+- model: denuncias.LugarReferencia
+  pk: 11
+  fields:
+    nombre_lugar: "Salón 11"
+    id_tipo: 2
+    id_programa: 3
+
+- model: denuncias.LugarReferencia
+  pk: 12
+  fields:
+    nombre_lugar: "Salón 12"
+    id_tipo: 2
+    id_programa: 3
+
+- model: denuncias.LugarReferencia
+  pk: 13
+  fields:
+    nombre_lugar: "Salón 13"
+    id_tipo: 2
+    id_programa: 3
+
+- model: denuncias.LugarReferencia
+  pk: 14
+  fields:
+    nombre_lugar: "Salón 14"
+    id_tipo: 2
+    id_programa: 3
+
+- model: denuncias.LugarReferencia
+  pk: 15
+  fields:
+    nombre_lugar: "Salón 15"
+    id_tipo: 2
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 16
+  fields:
+    nombre_lugar: "Salón 16"
+    id_tipo: 2
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 17
+  fields:
+    nombre_lugar: "Salón 17"
+    id_tipo: 2
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 18
+  fields:
+    nombre_lugar: "Salón 18"
+    id_tipo: 2
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 19
+  fields:
+    nombre_lugar: "Salón 19"
+    id_tipo: 2
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 20
+  fields:
+    nombre_lugar: "Baños piso 1"
+    id_tipo: 5
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 21
+  fields:
+    nombre_lugar: "Baños piso 3"
+    id_tipo: 5
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 22
+  fields:
+    nombre_lugar: "Centro de computación 1"
+    id_tipo: 2
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 23
+  fields:
+    nombre_lugar: "Centro de computación 2"
+    id_tipo: 2
+    id_programa: 2
