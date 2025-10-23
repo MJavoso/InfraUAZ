@@ -13,4 +13,4 @@ COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod 744 /entrypoint.sh
 
-ENTRYPOINT ["/entrypoint.sh", "--await-db", "--migrate"]
+ENTRYPOINT ["/entrypoint.sh", "--await-db", "--migrate", "--runserver"]

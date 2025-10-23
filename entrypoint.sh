@@ -1,5 +1,7 @@
 #!/bin/sh
 
+RUN_SERVER=false
+
 function await_db() {
     echo "Conectándose a la base de datos ($DB_HOST:$DB_PORT)..."
     while ! nc -z $DB_HOST $DB_PORT; do
@@ -25,13 +27,18 @@ while [[ $# -gt 0 ]]; do
       run_migrations
       shift
       ;;
+    --runserver)
+      RUN_SERVER=true
+      shift
+      ;;
     *)
       shift
       ;;
   esac
 done
 
-# Iniciar el servidor (usualmente gunicorn o runserver)
-echo "Iniciando servidor..."
-
-exec python manage.py runserver 0.0.0.0:8000
+if [ "$RUN_SERVER" = true ] ; then
+    # Iniciar el servidor (usualmente gunicorn o runserver)
+    echo "Iniciando servidor..."
+    exec python manage.py runserver 0.0.0.0:8000
+fi
