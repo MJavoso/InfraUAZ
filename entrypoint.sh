@@ -21,6 +21,8 @@ function all_fixtures() {
     python manage.py loaddata estadosDenuncia
     python manage.py loaddata tiposDenuncia
     python manage.py loaddata tiposLugarReferencia
+    python manage.py loaddata programasAcademicos
+    python manage.py loaddata lugaresReferencia
 }
 
 # Procesar las banderas pasadas al script
