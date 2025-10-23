@@ -1,0 +1,16 @@
+- model: denuncias.TipoDenuncia
+  pk: 1
+  fields:
+    descripcion: INFRAESTRUCTURA
+- model: denuncias.TipoDenuncia
+  pk: 2
+  fields:
+    descripcion: MOBILIARIO
+- model: denuncias.TipoDenuncia
+  pk: 3
+  fields:
+    descripcion: SERVICIOS
+- model: denuncias.TipoDenuncia
+  pk: 4
+  fields:
+    descripcion: OTROS
