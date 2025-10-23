@@ -130,6 +130,9 @@ STATICFILES_DIRS = (
 )
 STATIC_ROOT = path.join(BASE_DIR, 'staticfiles/')
 
+FIXTURE_DIRS = [
+    path.join(BASE_DIR / 'fixtures')
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
