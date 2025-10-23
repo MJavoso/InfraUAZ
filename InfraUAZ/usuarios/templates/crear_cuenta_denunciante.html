@@ -1,0 +1,62 @@
+{% extends 'usuarios_base.html' %}
+{% load static %}
+
+{% block titulo %}
+Crear cuenta
+{% endblock titulo %}
+
+{% block contenido %}
+<main class="full-container flex-col center-h">
+    <div class="create-account-container flex-col center-h">
+        <div class="create-account-header">
+            <h2>Crear cuenta</h2>
+            <p>Regístrate para reportar incidencias en el campus</p>
+            
+            {% if creado %}
+                <p>Usuario creado</p>
+            {% endif %}
+        </div>
+        <form method="post" class="flex-col base-form">
+            {% csrf_token %}
+            <div class="form-element flex-col">
+                {{ denunciante_form.nombre.label_tag }}
+                {{ denunciante_form.nombre }}
+            </div>
+
+            <div class="form-element flex-col">
+                
+                {% for error in denunciante_form.correo.errors %}
+                    <p>{{error}}</p>
+                {% endfor %}
+
+                {{ denunciante_form.correo.label_tag }}
+                {{ denunciante_form.correo }}
+            </div>
+
+            <div class="form-element flex-col">
+                {% for error in denunciante_form.contrasena.errors %}
+                    <p>{{error}}</p>
+                {% endfor %}
+
+                {{ denunciante_form.contrasena.label_tag }}
+                {{ denunciante_form.contrasena }}
+                <p class="note-text">Debe ser un correo institucional de la UAZ</p>
+            </div>
+
+            <div class="form-element flex-col">
+                {% for error in denunciante_form.contrasena.errors %}
+                    <p>{{error}}</p>
+                {% endfor %}
+
+                {{ denunciante_form.confirmar_contrasena.label_tag }}
+                {{ denunciante_form.confirmar_contrasena }}
+            </div>
+            <button type="submit" class="submit-btn-blue">
+                Crear cuenta
+            </button>
+
+            <span>¿Ya tienes cuenta? <a href="#" class="login-redirect-btn">Inicia sesión</a></span>
+        </form>
+    </div>
+</main>
+{% endblock contenido %}

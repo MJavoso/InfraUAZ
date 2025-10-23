@@ -1,0 +1,97 @@
+:root {
+    --create-account-blue-bg: #1e40af;
+}
+
+body {
+    background-color: #eceff1;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.full-container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.center-h {
+    align-items: center;
+}
+
+.note-text {
+    font-size: 0.85rem;
+    color: #8f8f8f;
+    margin: 0;
+    margin-top: 0.5rem;
+}
+
+/*
+Estilos de crear cuenta de denunciante
+*/
+
+.create-account-container {
+    max-width: 500px;
+}
+
+.create-account-header {
+    background-color: var(--create-account-blue-bg);
+    color: white;
+    padding: 1rem 1rem 0 1rem;
+    border-radius: 0.4rem 0.4rem 0 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.base-form {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 2rem 1rem;
+    background-color: white;
+    border-radius: 0 0 0.4rem 0.4rem;
+    border-left: 0.2rem solid var(--create-account-blue-bg);
+    border-right: 0.2rem solid var(--create-account-blue-bg);
+    border-bottom: 0.2rem solid var(--create-account-blue-bg);
+
+    & > :not(:last-child) {
+        margin-bottom: 0.8rem;
+    }
+}
+
+.form-element {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.submit-btn-blue {
+    background-color: var(--create-account-blue-bg);
+    padding: 0.8rem;
+    color: white;
+    font-size: 1.15rem;
+    font-weight: bold;
+    border-radius: 0.4rem;
+    border: 0;
+}
+
+.form-input {
+    font-size: 1.05rem;
+    background-color: #f3f3f5;
+    padding: 1rem 0.5rem;
+    border: 0;
+    border-radius: 0.5rem;
+    
+    &:focus {
+        outline: 2px solid #b6b6b6;
+    }
+}
+
+.login-redirect-btn {
+    text-decoration: none;
+}
