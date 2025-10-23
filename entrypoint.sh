@@ -16,6 +16,13 @@ function run_migrations() {
     python manage.py migrate
 }
 
+function all_fixtures() {
+    python manage.py loaddata edificios
+    python manage.py loaddata estadosDenuncia
+    python manage.py loaddata tiposDenuncia
+    python manage.py loaddata tiposLugarReferencia
+}
+
 # Procesar las banderas pasadas al script
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -25,6 +32,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --migrate)
       run_migrations
+      shift
+      ;;
+    --all-fixtures)
+      all_fixtures
       shift
       ;;
     --runserver)
