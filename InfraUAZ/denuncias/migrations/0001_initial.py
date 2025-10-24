@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='TipoDenuncia',
             fields=[
-                ('id_tipo_denuncia', models.CharField(primary_key=True, serialize=False)),
+                ('id_tipo_denuncia', models.AutoField(primary_key=True, serialize=False)),
                 ('descripcion', models.CharField(max_length=50)),
             ],
         ),

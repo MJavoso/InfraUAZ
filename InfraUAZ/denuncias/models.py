@@ -34,7 +34,7 @@ class LugarReferencia(models.Model):
     def __str__(self):
         return self.nombre_lugar
 class TipoDenuncia(models.Model):
-    id_tipo_denuncia = models.CharField(primary_key=True)
+    id_tipo_denuncia = models.AutoField(primary_key=True)
     descripcion = models.CharField(max_length=50, null=False, blank=False)
 
     def __str__(self):
