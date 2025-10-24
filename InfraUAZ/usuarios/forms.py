@@ -49,10 +49,12 @@ class DenuncianteForm(forms.Form):
         confirmar_contrasena = cleaned_data.get('confirmar_contrasena')
 
         if len(contrasena) < 8:
-            raise forms.ValidationError('La contraseña debe de ser mínimo de 8 caracteres')
+            self.add_error('contrasena', 'La contraseña debe ser de al menos 8 caracteres')
+            return cleaned_data
         
         if contrasena != confirmar_contrasena:
-            raise forms.ValidationError('Las contraseñas no coinciden')
+            self.add_error('confirmar_contrasena', 'Las contraseñas no coinciden')
+            return cleaned_data
 
         return cleaned_data
     
@@ -67,3 +69,34 @@ class DenuncianteForm(forms.Form):
         usuario = Usuario.objects.create_user(correo=correo, nombre=nombre, contrasena=contrasena)
         denunciante = Denunciante.objects.create(usuario=usuario)
         return denunciante
+
+class LoginForm(forms.Form):
+    correo = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control bg-light",
+                "placeholder": "usuario@uaz.edu.mx"
+            }
+        ),
+        label="Correo electrónico",
+        validators=[validar_correo_uaz]
+    )
+
+    contrasena = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control bg-light",
+                "placeholder": "••••••••"
+            }
+        )
+    )
+
+    recordarme = forms.BooleanField(
+        label='Recordarme',
+        required=False,
+        widget=forms.CheckboxInput(
+            attrs={
+                "class": "form-check-input"
+            }
+        )
+    )
