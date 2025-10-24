@@ -1,4 +1,4 @@
-{% extends 'usuarios_base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
 {% block titulo %}
@@ -6,6 +6,7 @@ Crear cuenta
 {% endblock titulo %}
 
 {% block contenido %}
+{% include 'nav_bar.html' %}
 <main class="full-container flex-col center-h">
     <div class="create-account-container flex-col center-h">
         <div class="create-account-header">
