@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpRequest
 from .forms import DenuncianteForm
 from django.contrib import messages
@@ -35,3 +35,29 @@ def registro_admin(request):
     return render(request, 'registro_admin.html', {'form': form})
 
 #k
+def login(request: HttpRequest):
+    form = LoginForm()
+    error = None
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            correo = form.cleaned_data["correo"]
+            contrasena = form.cleaned_data["contrasena"]
+            try:
+                usuario = Usuario.objects.get(correo=correo)
+                if usuario.check_password(contrasena):
+                    auth_login(request, usuario)
+                    return redirect('muro_denuncias')
+                else:
+                    error = "Correo o contraseña incorrectos"
+            except Usuario.DoesNotExist:
+                error = "Correo o contraseña incorrectos"
+    context = {
+        "form": form,
+        "error": error
+    }
+    return render(request, 'login.html', context=context)
+
+def logout(request):
+    auth_logout(request)
+    return redirect('login')

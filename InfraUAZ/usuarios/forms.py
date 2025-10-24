@@ -51,10 +51,12 @@ class DenuncianteForm(forms.Form):
         confirmar_contrasena = cleaned_data.get('confirmar_contrasena')
 
         if len(contrasena) < 8:
-            raise forms.ValidationError('La contraseña debe de ser mínimo de 8 caracteres')
+            self.add_error('contrasena', 'La contraseña debe ser de al menos 8 caracteres')
+            return cleaned_data
         
         if contrasena != confirmar_contrasena:
-            raise forms.ValidationError('Las contraseñas no coinciden')
+            self.add_error('confirmar_contrasena', 'Las contraseñas no coinciden')
+            return cleaned_data
 
         return cleaned_data
     
