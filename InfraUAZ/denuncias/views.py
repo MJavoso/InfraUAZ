@@ -75,4 +75,3 @@ def lugar_referencia(request, id_programa, id_tipolugar):
     )
     data = [{"id": lr.id_lugar, "nombre": lr.nombre_lugar} for lr in lugares_referencia]
     return JsonResponse(data, safe=False)
-
