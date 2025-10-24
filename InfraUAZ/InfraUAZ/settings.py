@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from os import getenv, path
+from django.urls import reverse_lazy
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -129,6 +130,10 @@ STATICFILES_DIRS = (
     path.join(BASE_DIR, 'static/'),
 )
 STATIC_ROOT = path.join(BASE_DIR, 'staticfiles/')
+
+LOGIN_URL = reverse_lazy('login') #/usuarios/login
+LOGIN_REDIRECT_URL = reverse_lazy('muro_denuncias')
+LOGOUT_REDIRECT_URL = reverse_lazy('login')
 
 FIXTURE_DIRS = [
     path.join(BASE_DIR / 'fixtures')
