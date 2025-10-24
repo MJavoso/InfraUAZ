@@ -16,3 +16,6 @@ def registrar_denunciante(request: HttpRequest):
         'creado': creado
     }
     return render(request, 'crear_cuenta_denunciante.html', context=context)
+
+def registro_admin(request):
+    return render(request, 'registro_admin.html')
