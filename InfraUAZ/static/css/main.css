@@ -1,5 +1,6 @@
 :root {
     --create-account-blue-bg: #1e40af;
+    --login-green-bg: #007a33;
 }
 
 body {
@@ -94,4 +95,25 @@ Estilos de crear cuenta de denunciante
 
 .login-redirect-btn {
     text-decoration: none;
+}
+
+/* Login */
+.login-header {
+    background-color: var(--login-green-bg);
+    border-radius: 0.4rem 0.4rem 0 0;
+    padding: 1rem;
+    border-top: 1px solid black;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+}
+
+.login-form {
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+}
+
+.submit-btn-green {
+    background-color: var(--login-green-bg) !important;
+    border: none !important;
 }

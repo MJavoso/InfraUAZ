@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+
+{% block titulo %}
+    Iniciar sesión
+{% endblock titulo %}
+
+
+{% block contenido %}
+{% include 'nav_bar.html' %}
+<main class="container flex-column d-flex align-items-center justify-content-center flex-grow-1 w-25 p-1 login-body">
+    
+    <section class="flex login-header w-100 text-white">
+        <i class="bi bi-person-circle text-white align-self-center fs-2"></i>
+        <div class="flex-column ms-2">
+            <h3>Iniciar sesión</h3>
+            <p>Accede al sistema de reportes</p>
+        </div>
+    </section>
+    <section class="w-100 p-3 login-form">
+        <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="{{ form.correo.id_for_label }}" class="form-label">
+                {{ form.correo.label }}
+            </label>
+            {{ form.correo }}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.contrasena.id_for_label }}" class="form-label">
+                {{ form.contrasena.label }}
+            </label>
+            {{ form.contrasena }}
+        </div>
+        <div class="mb-3 form-check">
+            {{ form.recordarme }}
+            <label for="{{ form.recordarme.id_for_label }}">
+                {{ form.recordarme.label }}
+            </label>
+
+            <a href="#">Olvidó su contraseña</a>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 submit-btn-green">Iniciar sesión</button>
+    </form>
+    <hr>
+    <span>
+        ¿Todavía no tienes cuenta? <a href="{% url 'crear_cuenta_denunciante' %}">Regístrate</a>
+    </span>
+    <hr>
+    <div class="bg-light border rounded p-3">
+        <p><b>Información:</b> Este sistema maneja información confidencial. Su acceso
+        quedará registrado conforme a las políticas de seguirdad de la UAZ.</p>
+    </div>
+    </section>
+</main>
+{% endblock contenido %}
