@@ -1,0 +1,36 @@
+{# denuncias/templates/nav_bar.html #}
+{% load static %}
+<!-- Barra de navegación superior -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">
+                <div class="d-flex align-items-center ms-3">
+                    <span class="bg-primary text-white px-2 py-1 rounded me-2">UAZ</span>
+                    <div class="d-none d-lg-flex flex-column">
+                        <strong class="text-dark">Sistema de Reportes de Incidentes</strong>
+                        <small class="text-secondary">Campus Siglo XXI</small>
+                    </div>
+                </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" 
+                aria-expanded="false" 
+                aria-label="Toggle navigation">
+                <pan class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Nueva Denuncia</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Mi Perfil</a>
+                    </li>
+                    <li class="nav-item mt-2 mt-lg-0">
+                        <a class="btn btn-primary text-white w-100 w-lg-auto" href="#">Iniciar Sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
