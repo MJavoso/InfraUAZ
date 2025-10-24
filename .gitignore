@@ -4,4 +4,7 @@ venv/
 .env
 
 *.pyc
+InfraUAZ/InfraUAZ/__pycache__/__init__.cpython-311.pyc
+InfraUAZ/InfraUAZ/__pycache__/urls.cpython-311.pyc
+InfraUAZ/InfraUAZ/__pycache__/wsgi.cpython-311.pyc
 __pycache__/
