@@ -1,0 +1,64 @@
+{% extends "basee.html" %}
+
+{% block title %}Agregar Administrador{% endblock %}
+
+{% block content %}
+<!-- Botón para abrir el cuadro de dialogo (solo fue una prueba)-->
+<div class="text-center mt-5">
+  
+</div>
+
+<!-- Cuadro de dialogo -->
+<div class="modal show d-block" id="adminModal" tabindex="-1" aria-labelledby="adminModalLabel" aria-hidden="false" style="background-color: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg border-0 rounded-4">
+
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold" id="modalAdminLabel">
+          <i class="bi bi-person-plus me-2 text-primary"></i> Agregar Nuevo Administrador
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="modal-body">
+        <p class="text-muted mb-4">
+          Complete los datos del nuevo administrador del sistema
+        </p>
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Nombre completo <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" placeholder="Ej: Juan Pérez García" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Correo institucional <span class="text-danger">*</span></label>
+            <input type="email" class="form-control" placeholder="correo@uaz.edu.mx" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Contraseña <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" placeholder="Mínimo 6 caracteres" minlength="6" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Confirmar contraseña <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" placeholder="Repite la contraseña" required>
+          </div>
+
+          <div class="d-flex justify-content-end mt-4">
+            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-person-plus me-1"></i> Agregar Administrador
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
