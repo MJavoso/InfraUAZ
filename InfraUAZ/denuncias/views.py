@@ -1,14 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Denuncia, Insumo
 from django.shortcuts import render
 from .forms import DenunciaForm
-from .models import TipoDenuncia, Edificio, TipoLugarReferencia, ProgramaAcademico, LugarReferencia
+from .models import ProgramaAcademico, LugarReferencia, Denuncia, Insumo
 from django.http import JsonResponse
 from django.http import HttpRequest
-# Create your views here.
-
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Denuncia, Insumo
 
 #------------------ Vista del muro de denuncias ------------------#
 def muro_denuncias(request):
@@ -22,10 +17,6 @@ def muro_denuncias(request):
     # Renderizar la plantilla con las denuncias obtenidas
     return render(request, 'muro_denuncias.html', {'denuncias': denuncias})
 
-#------------------ Vista para crear una nueva denuncia ------------------#
-
-def crear_denuncia(request):
-    return render(request, 'crear_denuncia.html')
 
 #------------------ Vista de detalle de denuncia ------------------#
 def detalle_denuncia(request, id_denuncia):
@@ -55,6 +46,9 @@ def agregar_insumo(request, id_denuncia):
         )
     # Redirigir a la página de detalle de la denuncia después de agregar el insumo
     return redirect('detalle_denuncia', id_denuncia=id_denuncia)
+
+
+
 def crear_denuncia(request: HttpRequest):
     denuncia_form = DenunciaForm()
     creado = False
@@ -65,6 +59,7 @@ def crear_denuncia(request: HttpRequest):
     #         creado = True
     context = {'denuncia_form':denuncia_form, 'creado':creado}
     return render(request, 'crear_denuncia.html',context)
+
 
 def filtrar_programas_por_edificio(request, id_edificio):
     programas = ProgramaAcademico.objects.filter(id_edificio_id=id_edificio)
@@ -78,34 +73,4 @@ def lugar_referencia(request, id_programa, id_tipolugar):
     )
     data = [{"id": lr.id_lugar, "nombre": lr.nombre_lugar} for lr in lugares_referencia]
     return JsonResponse(data, safe=False)
-def crear_denuncia(request):
-    return render(request, 'crear_denuncia.html')
 
-#------------------ Vista de detalle de denuncia ------------------#
-def detalle_denuncia(request, id_denuncia):
-    # Obtener la denuncia por su ID o devolver un error 404 si no existe
-    denuncia = get_object_or_404(Denuncia, id_denuncia=id_denuncia)
-    # Renderizar la plantilla con la denuncia obtenida
-    return render(request, 'detalle_denuncia.html', {'denuncia':denuncia})
-
-# Agrega un insumo en la plantilla detalle_denuncia.html
-# en la parte de insumos
-def agregar_insumo(request, id_denuncia):
-    # Obtener la denuncia por su ID o devolver un error 404 si no existe
-    denuncia = get_object_or_404(Denuncia, pk=id_denuncia)
-    # Si el método de la solicitud es POST, procesa el formulario
-    if request.method == "POST":
-        # Datos del insumo desde el formulario
-        nombre = request.POST.get("nombre")
-        cantidad = request.POST.get("cantidad")
-        costo = request.POST.get("costo")
-
-        # Crear y guardar el nuevo insumo asociado a la denuncia
-        Insumo.objects.create(
-            nombre=nombre,
-            cantidad=cantidad,
-            costo=costo,
-            id_denuncia=denuncia
-        )
-    # Redirigir a la página de detalle de la denuncia después de agregar el insumo
-    return redirect('detalle_denuncia', id_denuncia=id_denuncia)
