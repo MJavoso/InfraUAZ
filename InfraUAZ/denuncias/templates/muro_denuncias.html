@@ -220,6 +220,106 @@
                             <!-- Más denuncias... -->
                         </div>
 
+                <!-- Paginación -->
+                <div class="card-footer bg-white">
+                    <nav aria-label="Paginación de denuncias">
+                        <ul class="pagination justify-content-center mb-0">
+                            <li class="page-item disabled">
+                                <a class="page-link">Anterior</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Siguiente</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fila principal -->
+<div class="row mx-0">
+    <!-- Sidebar -->
+    <div class="col-12 col-md-3 col-xl-3 border-end bg-white">
+        <div class="px-3 pt-3 pb-4">
+            <h6 class="text-primary mb-3">
+                <i class="bi bi-funnel me-2"></i>Filtros de Búsqueda
+            </h6>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Tipo de denuncia</label>
+                <select class="form-select">
+                    <option>Todos los tipos</option>
+                    <option>Infraestructura</option>
+                    <option>Mantenimiento</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Estado</label>
+                <select class="form-select">
+                    <option>Todos los estados</option>
+                    <option>Pendiente</option>
+                    <option>En revisión</option>
+                    <option>Resuelta</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Rango de fechas</label>
+                <input type="date" class="form-control mb-2">
+                <input type="date" class="form-control mb-2">
+                <button class="btn btn-outline-secondary w-100">Limpiar filtros</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="col-12 col-md-9 col-xl-9">
+        <div class="card border-0 shadow-sm mt-3 mt-md-0">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-exclamation-triangle me-2 text-primary"></i>
+                Denuncias recientes
+            </div>
+
+            <div class="card-body" style="max-height: 420px; overflow-y: auto;">
+                {% for denuncia in denuncias %}
+                <a href="{% url 'detalle_denuncia' denuncia.id_denuncia %}" 
+                   class="text-decoration-none text-dark">
+                    <div class="mb-3 p-3 border rounded bg-white hover-shadow-sm denuncia-card">
+                        <h6 class="fw-semibold">
+                            {{ denuncia.título }}
+                            <span class="badge 
+                                {% if denuncia.id_tipo_denuncia.descripcion == 'Infraestructura' %}
+                                    bg-warning text-dark
+                                {% elif denuncia.id_tipo_denuncia.descripcion == 'Mantenimiento' %}
+                                    bg-info text-dark
+                                {% else %}
+                                    bg-secondary
+                                {% endif %}
+                                ms-2">
+                                {{ denuncia.id_tipo_denuncia.descripcion }}
+                            </span>
+                        </h6>
+                        <p class="mb-1 text-muted">
+                            {{ denuncia.descripcion|truncatechars:120 }}
+                        </p>
+                        <small class="text-muted">
+                            📍 {{ denuncia.id_lugar.id_programa.id_edificio.nombre }} – {{ denuncia.id_lugar.nombre_lugar }}
+                            | ⚠️ {{ denuncia.id_estado.estado }}
+                            | 📅 {{ denuncia.fecha|date:"d/m/Y" }}
+                        </small>
+                    </div>
+                </a>
+                {% empty %}
+                <p class="text-muted">No hay denuncias registradas.</p>
+                {% endfor %}
+            </div>
+
                         <!-- Paginación -->
                         <div class="card-footer bg-white">
                             <nav aria-label="Paginación de denuncias">
