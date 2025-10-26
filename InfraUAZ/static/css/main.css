@@ -1,6 +1,8 @@
 :root {
     --create-account-blue-bg: #1e40af;
+    --create-account-blue-primary-light: #dbeafe;
     --login-green-bg: #007a33;
+    --login-green-primary-light: #dbfce7;
 }
 
 body {
@@ -27,11 +29,43 @@ body {
     align-items: center;
 }
 
+.bg-light-blue {
+    background-color: var(--create-account-blue-primary-light);
+}
+
+.text-strong-blue {
+    color: var(--create-account-blue-bg);
+}
+
+.bg-light-green {
+    background-color: var(--login-green-primary-light);
+}
+
+.text-strong-green {
+    color: var(--login-green-bg);
+}
+
 .note-text {
     font-size: 0.85rem;
     color: #8f8f8f;
     margin: 0;
     margin-top: 0.5rem;
+}
+
+.hoverable-box {
+    transition: border 0.2s ease;
+    transition: box-shadow 0.2s ease;
+}
+
+.hoverable-box:hover {
+    border: 0.1rem solid limegreen !important;
+    box-shadow: 0.1rem 0.1rem 0.1rem black;
+}
+
+@media (width >= 768px) {
+    .w-md-50 {
+        width: 50% !important;
+    }
 }
 
 /*
