@@ -4,6 +4,9 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from .forms import DenuncianteForm, LoginForm
 from .models import Usuario
 from .utils import es_administrador
+from .forms import DenuncianteForm
+from django.contrib import messages
+from .forms import AdministradorForm
 
 def registrar_denunciante(request: HttpRequest):
     form = DenuncianteForm()
@@ -75,3 +78,19 @@ def login_administrador(request: HttpRequest):
 def logout(request):
     auth_logout(request)
     return redirect('login')
+
+#agregar administrador
+def registro_admin(request):
+    if request.method == "POST":
+        form = AdministradorForm(request.POST)
+        if form.is_valid():
+            # Guardar el administrador
+            form.save()
+            messages.success(request, "Administrador agregado correctamente")
+            form = AdministradorForm()  # Limpiar el formulario
+        else:
+            messages.error(request, "Por favor corrige los errores del formulario")
+    else:
+        form = AdministradorForm()
+
+    return render(request, 'registro_admin.html', {'form': form})
