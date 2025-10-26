@@ -18,6 +18,7 @@ def registrar_denunciante(request: HttpRequest):
             denunciante = form.save()
             creado = True
             # TODO: Enviar correo de verificación
+            return redirect('login')
     context = {
         'denunciante_form': form,
         'creado': creado
