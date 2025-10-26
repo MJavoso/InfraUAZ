@@ -12,6 +12,9 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from .forms import DenuncianteForm, LoginForm
 from .models import Usuario
 from .utils import es_administrador
+from .forms import DenuncianteForm
+from django.contrib import messages
+from .forms import AdministradorForm
 
 def registrar_denunciante(request: HttpRequest):
     form = DenuncianteForm()
