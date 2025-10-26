@@ -11,6 +11,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from .forms import DenuncianteForm, LoginForm
 from .models import Usuario
+from .utils import es_administrador
 
 def registrar_denunciante(request: HttpRequest):
     form = DenuncianteForm()
