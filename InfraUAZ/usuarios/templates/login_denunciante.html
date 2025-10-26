@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+
+{% block titulo %}
+    Iniciar sesión
+{% endblock titulo %}
+
+
+{% block contenido %}
+{% include 'nav_bar.html' %}
+<main class="container flex-column d-flex align-items-center justify-content-center flex-grow-1 w-75 w-md-50 p-1 login-body">
+    
+    {% include 'login_header.html' %}
+    <section class="w-100 p-3 login-form bg-white">
+        <div class="mb-3 d-flex flex-column flex-sm-row align-items-center">
+            <i class="bi bi-person fs-5 text-strong-blue me-2"></i>
+            <h2 class="fs-5 m-0 flex-grow-1">Denunciante</h2>
+            <a href="{% url 'login' %}" class="text-reset text-decoration-none">Cambiar</a>
+        </div>
+        <form method="post">
+        {% csrf_token %}
+        
+        {% if form.errors or error %}
+            <div class="alert alert-danger" role="alert">
+                
+                {% if error %}
+                    <p>{{ error }}</p>
+                {% endif %}
+                    
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <label for="{{ form.correo.id_for_label }}" class="form-label">
+                {{ form.correo.label }}
+            </label>
+            {{ form.correo }}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.contrasena.id_for_label }}" class="form-label">
+                {{ form.contrasena.label }}
+            </label>
+            {{ form.contrasena }}
+        </div>
+        <div class="mb-3 form-check">
+            {{ form.recordarme }}
+            <label for="{{ form.recordarme.id_for_label }}">
+                {{ form.recordarme.label }}
+            </label>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 submit-btn-green">Iniciar sesión</button>
+    </form>
+    <hr>
+    <span>
+        ¿Todavía no tienes cuenta? <a href="{% url 'crear_cuenta_denunciante' %}" class="text-strong-green">Regístrate</a>
+    </span>
+    <hr>
+    {% include 'login_footer.html' %}
+    </section>
+</main>
+{% endblock contenido %}

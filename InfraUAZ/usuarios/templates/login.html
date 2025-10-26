@@ -2,55 +2,43 @@
 
 
 {% block titulo %}
-    Iniciar sesión
+Iniciar sesión
 {% endblock titulo %}
 
 
 {% block contenido %}
 {% include 'nav_bar.html' %}
-<main class="container flex-column d-flex align-items-center justify-content-center flex-grow-1 w-25 p-1 login-body">
-    
-    <section class="flex login-header w-100 text-white">
-        <i class="bi bi-person-circle text-white align-self-center fs-2"></i>
-        <div class="flex-column ms-2">
-            <h3>Iniciar sesión</h3>
-            <p>Accede al sistema de reportes</p>
-        </div>
-    </section>
-    <section class="w-100 p-3 login-form">
-        <form method="post">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="{{ form.correo.id_for_label }}" class="form-label">
-                {{ form.correo.label }}
-            </label>
-            {{ form.correo }}
-        </div>
-        <div class="mb-3">
-            <label for="{{ form.contrasena.id_for_label }}" class="form-label">
-                {{ form.contrasena.label }}
-            </label>
-            {{ form.contrasena }}
-        </div>
-        <div class="mb-3 form-check">
-            {{ form.recordarme }}
-            <label for="{{ form.recordarme.id_for_label }}">
-                {{ form.recordarme.label }}
-            </label>
+<main class="flex-column d-flex align-self-center align-items-center justify-content-center flex-grow-1 w-md-50 w-75 p1 login-body">
+    {% include 'login_header.html' %}
+    <section class="w-100 p-3 login-form bg-white">
+        <h1 class="fs-4">Seleccione su tipo de usuario</h1>
 
-            <a href="#">Olvidó su contraseña</a>
-        </div>
-        <button type="submit" class="btn btn-primary w-100 submit-btn-green">Iniciar sesión</button>
-    </form>
-    <hr>
-    <span>
-        ¿Todavía no tienes cuenta? <a href="{% url 'crear_cuenta_denunciante' %}">Regístrate</a>
-    </span>
-    <hr>
-    <div class="bg-light border rounded p-3">
-        <p><b>Información:</b> Este sistema maneja información confidencial. Su acceso
-        quedará registrado conforme a las políticas de seguirdad de la UAZ.</p>
-    </div>
+        <a href="{% url 'login_denunciante' %}"
+            class="text-reset text-decoration-none mb-3 container border rounded p-3 d-flex flex-column flex-sm-row align-items-center hoverable-box">
+            <div class="border rounded bg-light-blue p-2">
+                <i class="bi bi-person fs-5 text-strong-blue"></i>
+            </div>
+            <div class="d-flex flex-column ms-2">
+                <p class="mb-1 fs-5">Denunciante</p>
+                <p class="mt-0 note-text">
+                    Estudiante, personal docente, etc.
+                </p>
+            </div>
+        </a>
+        <a href="{% url 'login_administrador' %}"
+            class="text-reset text-decoration-none mb-1 container border rounded p-3 d-flex flex-column flex-sm-row align-items-center hoverable-box">
+            <div class="border rounded bg-light-green p-2">
+                <i class="bi bi-shield fs-5 text-strong-green"></i>
+            </div>
+            <div class="d-flex flex-column ms-2">
+                <p class="mb-1 fs-5">Administrador</p>
+                <p class="mt-0 note-text">
+                    Personal autorizado para gestionar reportes
+                </p>
+            </div>
+        </a>
+        <hr>
+        {% include 'login_footer.html' %}
     </section>
 </main>
 {% endblock contenido %}
