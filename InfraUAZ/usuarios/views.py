@@ -18,20 +18,3 @@ def registrar_denunciante(request: HttpRequest):
         'creado': creado
     }
     return render(request, 'crear_cuenta_denunciante.html', context=context)
-
-
-#agregar administrador
-def registro_admin(request):
-    if request.method == "POST":
-        form = AdministradorForm(request.POST)
-        if form.is_valid():
-            # Guardar el administrador
-            form.save()
-            messages.success(request, "Administrador agregado correctamente")
-            form = AdministradorForm()  # Limpiar el formulario
-        else:
-            messages.error(request, "Por favor corrige los errores del formulario")
-    else:
-        form = AdministradorForm()
-
-    return render(request, 'registro_admin.html', {'form': form})
