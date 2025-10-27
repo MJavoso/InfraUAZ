@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.http import HttpRequest
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from .forms import DenuncianteForm, LoginForm
+from .forms import DenuncianteForm, LoginForm, AdministradorForm
 from .models import Usuario
 from .utils import es_administrador
+from django.contrib import messages
 
 def registrar_denunciante(request: HttpRequest):
     form = DenuncianteForm()
@@ -21,6 +22,21 @@ def registrar_denunciante(request: HttpRequest):
     }
     return render(request, 'crear_cuenta_denunciante.html', context=context)
 
+def registro_admin(request):
+    if request.method == "POST":
+        form = AdministradorForm(request.POST)
+        if form.is_valid():
+            form.save()  # <-- ahora hace todo internamente
+            messages.success(request, "Administrador agregado correctamente.")
+            return redirect('registro_admin')
+        else:
+            messages.error(request, "Por favor corrige los errores del formulario.")
+    else:
+        form = AdministradorForm()
+
+    return render(request, 'registro_admin.html', {'form': form})
+
+#k
 def login(request: HttpRequest):
     return render(request, 'login.html')
 

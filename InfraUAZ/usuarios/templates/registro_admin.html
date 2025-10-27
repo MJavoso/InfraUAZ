@@ -1,0 +1,86 @@
+{% extends "basee.html" %}
+
+{% block title %}Agregar Administrador{% endblock %}
+
+{% block content %}
+<div class="text-center mt-5">
+ 
+</div>
+
+<!-- Modal de administrador -->
+<div class="modal show d-block" id="adminModal" tabindex="-1" aria-labelledby="adminModalLabel" aria-hidden="false" style="background-color: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg border-0 rounded-4">
+
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold" id="modalAdminLabel">
+          <i class="bi bi-person-plus me-2 text-primary"></i> Agregar Nuevo Administrador
+        </h5>
+      </div>
+
+      <div class="modal-body">
+        <p class="text-muted mb-4">
+          Complete los datos del nuevo administrador del sistema
+        </p>
+
+        <!-- Mensajes generales -->
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <!-- Formulario -->
+        <form method="post">
+          {% csrf_token %}
+
+          <!-- Errores no asociados que no van a un campo específico -->
+          {{ form.non_field_errors }}
+
+          <div class="mb-3">
+            {{ form.nombre.label_tag }} <span class="text-danger">*</span>
+            {{ form.nombre }}
+            {{ form.nombre.errors }}
+          </div>
+
+          <div class="mb-3">
+            {{ form.correo.label_tag }} <span class="text-danger">*</span>
+            {{ form.correo }}
+            {{ form.correo.errors }}
+          </div>
+
+          <div class="mb-3">
+            {{ form.contrasena.label_tag }} <span class="text-danger">*</span>
+            {{ form.contrasena }}
+            {{ form.contrasena.errors }}
+          </div>
+
+          <div class="mb-3">
+            {{ form.confirmar_contrasena.label_tag }} <span class="text-danger">*</span>
+            {{ form.confirmar_contrasena }}
+            {{ form.confirmar_contrasena.errors }}
+          </div>
+
+          <div class="mb-3">
+            {{ form.programa_academico.label_tag }} <span class="text-danger">*</span>
+            {{ form.programa_academico }}
+            {{ form.programa_academico.errors }}
+          </div>
+
+          <div class="d-flex justify-content-end mt-4">
+            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-person-plus me-1"></i> Agregar Administrador
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
