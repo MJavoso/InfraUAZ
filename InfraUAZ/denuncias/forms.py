@@ -1,5 +1,6 @@
 from django import forms
-from .models import TipoDenuncia, ProgramaAcademico, Edificio, TipoLugarReferencia, LugarReferencia
+from .models import TipoDenuncia, Denunciante,ProgramaAcademico, Edificio, TipoLugarReferencia, LugarReferencia, Denuncia, EstadoDenuncia
+from django.utils import timezone
 
 class DenunciaForm(forms.Form):
     titulo = forms.CharField(
@@ -70,7 +71,7 @@ class DenunciaForm(forms.Form):
     )
 
     lugarReferencia = forms.ModelChoiceField(
-        queryset=ProgramaAcademico.objects.none(),
+        queryset=LugarReferencia.objects.none(),
         label = 'Programa académico *',
         empty_label= 'Seleccione el lugar de referencia',
         required=True,
@@ -80,7 +81,24 @@ class DenunciaForm(forms.Form):
         })
     )
 
+    def save(self, usuario):
+        print ("ENTRADO AL SAFE")
+        descripcion = self.cleaned_data['descripcion']
+        título = self.cleaned_data['titulo']
+        id_lugar = self.cleaned_data['lugarReferencia']
+        id_tipo_denuncia = self.cleaned_data['tipo_denuncia']
 
+        # crear la denuncia
+        denuncia = Denuncia.objects.create(
+            fecha = timezone.now().date(),
+            título = título,
+            id_estado = EstadoDenuncia.objects.get(estado = 'EN_PROCESO'),
+            descripcion=descripcion,
+            id_denunciante = Denunciante.objects.get(usuario=usuario),
+            id_lugar = id_lugar,
+            id_tipo_denuncia = id_tipo_denuncia
+        )
+        return denuncia
 
 
 
