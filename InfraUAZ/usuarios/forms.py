@@ -2,6 +2,7 @@ from django import forms
 from .validators import validar_correo_uaz
 from .models import Denunciante, Usuario, Administrador
 from django.core.exceptions import ValidationError
+from denuncias.models import ProgramaAcademico
 
 class DenuncianteForm(forms.Form):
     nombre = forms.CharField(
@@ -105,62 +106,61 @@ class LoginForm(forms.Form):
 
 #agregar administrador
 class AdministradorForm(forms.Form):
-    nombre = forms.CharField(
-        max_length=100,
-        label='Nombre completo',
-        widget=forms.TextInput(attrs={
-            "class": "form-control",
-            "placeholder": "Ej: Juan Pérez García"
-        })
-    )
     correo = forms.EmailField(
-        label='Correo institucional',
-        widget=forms.EmailInput(attrs={
-            "class": "form-control",
-            "placeholder": "correo@uaz.edu.mx"
-        })
+        label="Correo",
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico'})
+    )
+    nombre = forms.CharField(
+        label="Nombre",
+        max_length=100,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre completo'})
     )
     contrasena = forms.CharField(
-        label='Contraseña',
-        min_length=6,
-        widget=forms.PasswordInput(attrs={
-            "class": "form-control",
-            "placeholder": "Mínimo 6 caracteres"
-        })
+        label="Contraseña",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña'})
     )
     confirmar_contrasena = forms.CharField(
-        label='Confirmar contraseña',
-        min_length=6,
-        widget=forms.PasswordInput(attrs={
-            "class": "form-control",
-            "placeholder": "Repite la contraseña"
-        })
+        label="Confirmar contraseña",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirma la contraseña'})
+    )
+    programa_academico = forms.ModelChoiceField(
+        label="Programa Académico",
+        queryset=ProgramaAcademico.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'})
     )
 
     def clean(self):
+        #Validar que las contraseñas coincidan
         cleaned_data = super().clean()
         contrasena = cleaned_data.get('contrasena')
-        confirmar = cleaned_data.get('confirmar_contrasena')
+        confirmar_contrasena = cleaned_data.get('confirmar_contrasena')
 
-        if contrasena != confirmar:
-            raise ValidationError("Las contraseñas no coinciden")
-
-        # Verificar que el correo no exista ya
-        correo = cleaned_data.get('correo')
-        if Administrador.objects.filter(correo=correo).exists():
-            raise ValidationError("El correo ya está registrado")
-
+        if contrasena and confirmar_contrasena and contrasena != confirmar_contrasena:
+            raise forms.ValidationError("Las contraseñas no coinciden")
         return cleaned_data
+    
+    def clean_correo(self):
+        correo = self.cleaned_data['correo']
+        if Usuario.objects.filter(correo=correo).exists():
+            raise forms.ValidationError("Este correo ya está registrado.")
+        return correo
 
     def save(self):
-        nombre = self.cleaned_data['nombre']
         correo = self.cleaned_data['correo']
+        nombre = self.cleaned_data['nombre']
         contrasena = self.cleaned_data['contrasena']
+        programa = self.cleaned_data['programa_academico']
 
-        # Crear el administrador
-        admin = Administrador.objects.create(
-            nombre=nombre,
+        
+        usuario = Usuario.objects.create_staff_user(
             correo=correo,
-            contraseña=contrasena  # Opcional: aquí podrías hashearla
+            nombre=nombre,
+            contrasena=contrasena
         )
+
+        admin = Administrador.objects.create(
+            usuario=usuario,
+            programa_academico=programa
+        )
+
         return admin
