@@ -34,66 +34,22 @@
             </div>
         </div>
 
-        
+        <div class="col-6 col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <div class="fs-3 text-primary">⏱️</div>
+                    <h3 class="fw-bold mb-0">4</h3>
+                    <p class="text-muted mb-0">En revisión</p>
+                </div>
+            </div>
+        </div>
 
-                <!-- Contenido principal -->
-                <div class="col-12 col-md-9 col-xl-9">
-                    <div class="card border-0 shadow-sm mt-3 mt-md-0">
-                        <div class="card-header bg-white fw-semibold">
-                            <i class="bi bi-exclamation-triangle me-2 text-primary"></i>
-                            Denuncias recientes
-                        </div>
-
-                        <div class="card-body" style="max-height: 420px; overflow-y: auto;">
-                            {% for denuncia in denuncias %}
-                            <a href="{% url 'detalle_denuncia' denuncia.id_denuncia %}" 
-                               class="text-decoration-none text-dark">
-                               <div class="mb-3 p-3 border rounded bg-white hover-shadow-sm denuncia-card">
-                                   <h6 class="fw-semibold">
-                                        {{ denuncia.título }}
-                                        <span class="badge 
-                                            {% if denuncia.id_tipo_denuncia.descripcion == 'Infraestructura' %}
-                                                bg-warning text-dark
-                                            {% elif denuncia.id_tipo_denuncia.descripcion == 'Mantenimiento' %}
-                                                bg-info text-dark
-                                            {% else %}
-                                                bg-secondary
-                                            {% endif %}
-                                            ms-2">
-                                            {{ denuncia.id_tipo_denuncia.descripcion }}
-                                        </span>
-                                    </h6>
-                                    <p class="mb-1 text-muted">
-                                       {{ denuncia.descripcion|truncatechars:120 }}
-                                    </p>
-                                    <small class="text-muted">
-                                        📍 {{ denuncia.id_lugar.id_programa.id_edificio.nombre }} – {{ denuncia.id_lugar.nombre_lugar }}
-                                        | ⚠️ {{ denuncia.id_estado.estado }}
-                                        | 📅 {{ denuncia.fecha|date:"d/m/Y" }}
-                                   </small>
-                                </div>
-                            </a>
-                            {% empty %}
-                            <p class="text-muted">No hay denuncias registradas.</p>
-                            {% endfor %}
-                            <!-- Más denuncias... -->
-                        </div>
-
-                <!-- Paginación -->
-                <div class="card-footer bg-white">
-                    <nav aria-label="Paginación de denuncias">
-                        <ul class="pagination justify-content-center mb-0">
-                            <li class="page-item disabled">
-                                <a class="page-link">Anterior</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">Siguiente</a>
-                            </li>
-                        </ul>
-                    </nav>
+        <div class="col-6 col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <div class="fs-3 text-success">✅</div>
+                    <h3 class="fw-bold mb-0">5</h3>
+                    <p class="text-muted mb-0">Resueltas</p>
                 </div>
             </div>
         </div>
