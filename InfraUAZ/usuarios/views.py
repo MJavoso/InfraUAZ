@@ -9,13 +9,10 @@ from django.contrib import messages
 from .forms import AdministradorForm
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from .forms import DenuncianteForm, LoginForm
+from .forms import DenuncianteForm, LoginForm, AdministradorForm
 from .models import Usuario
 from .utils import es_administrador
-from .forms import DenuncianteForm
 from django.contrib import messages
-from .forms import AdministradorForm
-from django.shortcuts import render, redirect
 
 def registrar_denunciante(request: HttpRequest):
     form = DenuncianteForm()
