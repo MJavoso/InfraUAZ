@@ -13,5 +13,4 @@ urlpatterns = [
     path('login/administrador', views.login_administrador, name='login_administrador'),
     path('logout', views.logout, name='logout'),
     path('registro-admin/', views.registro_admin, name='registro_admin')
-   path('registro-admin/', views.registro_admin, name='registro_admin')
 ]
