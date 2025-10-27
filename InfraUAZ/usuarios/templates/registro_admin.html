@@ -3,15 +3,11 @@
 {% block title %}Agregar Administrador{% endblock %}
 
 {% block content %}
-<<<<<<< HEAD
-=======
-<!-- Botón para abrir el cuadro de dialogo (solo fue una prueba)-->
 <div class="text-center mt-5">
-  
+ 
 </div>
 
-<!-- Cuadro de dialogo -->
->>>>>>> d109600b149990c7efcabb460eae4105b0edac68
+<!-- Modal de administrador -->
 <div class="modal show d-block" id="adminModal" tabindex="-1" aria-labelledby="adminModalLabel" aria-hidden="false" style="background-color: rgba(0,0,0,0.5);">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content shadow-lg border-0 rounded-4">
@@ -20,7 +16,6 @@
         <h5 class="modal-title fw-bold" id="modalAdminLabel">
           <i class="bi bi-person-plus me-2 text-primary"></i> Agregar Nuevo Administrador
         </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
 
       <div class="modal-body">
@@ -28,8 +23,7 @@
           Complete los datos del nuevo administrador del sistema
         </p>
 
-<<<<<<< HEAD
-        <!-- Mensajes de éxito o error -->
+        <!-- Mensajes generales -->
         {% if messages %}
           {% for message in messages %}
             <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
@@ -38,55 +32,41 @@
           {% endfor %}
         {% endif %}
 
-        <!-- Formulario Django -->
+        <!-- Formulario -->
         <form method="post">
           {% csrf_token %}
+
+          <!-- Errores no asociados que no van a un campo específico -->
           {{ form.non_field_errors }}
 
           <div class="mb-3">
-            {{ form.nombre.label_tag }}
+            {{ form.nombre.label_tag }} <span class="text-danger">*</span>
             {{ form.nombre }}
             {{ form.nombre.errors }}
           </div>
 
           <div class="mb-3">
-            {{ form.correo.label_tag }}
+            {{ form.correo.label_tag }} <span class="text-danger">*</span>
             {{ form.correo }}
             {{ form.correo.errors }}
           </div>
 
           <div class="mb-3">
-            {{ form.contrasena.label_tag }}
+            {{ form.contrasena.label_tag }} <span class="text-danger">*</span>
             {{ form.contrasena }}
             {{ form.contrasena.errors }}
           </div>
 
           <div class="mb-3">
-            {{ form.confirmar_contrasena.label_tag }}
+            {{ form.confirmar_contrasena.label_tag }} <span class="text-danger">*</span>
             {{ form.confirmar_contrasena }}
             {{ form.confirmar_contrasena.errors }}
-=======
-        <form method="post">
-          {% csrf_token %}
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Nombre completo <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" placeholder="Ej: Juan Pérez García" required>
           </div>
 
           <div class="mb-3">
-            <label class="form-label fw-semibold">Correo institucional <span class="text-danger">*</span></label>
-            <input type="email" class="form-control" placeholder="correo@uaz.edu.mx" required>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Contraseña <span class="text-danger">*</span></label>
-            <input type="password" class="form-control" placeholder="Mínimo 6 caracteres" minlength="6" required>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Confirmar contraseña <span class="text-danger">*</span></label>
-            <input type="password" class="form-control" placeholder="Repite la contraseña" required>
->>>>>>> d109600b149990c7efcabb460eae4105b0edac68
+            {{ form.programa_academico.label_tag }} <span class="text-danger">*</span>
+            {{ form.programa_academico }}
+            {{ form.programa_academico.errors }}
           </div>
 
           <div class="d-flex justify-content-end mt-4">
@@ -98,10 +78,6 @@
             </button>
           </div>
         </form>
-<<<<<<< HEAD
-
-=======
->>>>>>> d109600b149990c7efcabb460eae4105b0edac68
       </div>
 
     </div>
