@@ -7,6 +7,7 @@ from .utils import es_administrador
 from .forms import DenuncianteForm
 from django.contrib import messages
 from .forms import AdministradorForm
+from django.shortcuts import render, redirect
 
 def registrar_denunciante(request: HttpRequest):
     form = DenuncianteForm()
@@ -84,12 +85,11 @@ def registro_admin(request):
     if request.method == "POST":
         form = AdministradorForm(request.POST)
         if form.is_valid():
-            # Guardar el administrador
-            form.save()
-            messages.success(request, "Administrador agregado correctamente")
-            form = AdministradorForm()  # Limpiar el formulario
+            form.save()  # <-- ahora hace todo internamente
+            messages.success(request, "Administrador agregado correctamente.")
+            return redirect('registro_admin')
         else:
-            messages.error(request, "Por favor corrige los errores del formulario")
+            messages.error(request, "Por favor corrige los errores del formulario.")
     else:
         form = AdministradorForm()
 
