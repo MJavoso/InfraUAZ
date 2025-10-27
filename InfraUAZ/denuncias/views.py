@@ -9,15 +9,7 @@ from django.contrib.auth.decorators import login_required
 #------------------ Vista del muro de denuncias ------------------#
 @login_required
 def muro_denuncias(request):
-    # Obtener todas las denuncias con sus relaciones necesarias para evitar consultas adicionales
-    denuncias = Denuncia.objects.select_related(
-        # Incluir las relaciones necesarias para optimizar las consultas
-        'id_estado', 
-        'id_lugar__id_programa__id_edificio', 
-        'id_tipo_denuncia'
-    ).order_by('-fecha') # Ordenar por fecha descendente
-    # Renderizar la plantilla con las denuncias obtenidas
-    return render(request, 'muro_denuncias.html', {'denuncias': denuncias})
+    return render(request, 'muro_denuncias.html')
 
 #------------------ Vista para crear una nueva denuncia ------------------#
 
@@ -118,16 +110,24 @@ def agregar_insumo(request, id_denuncia):
     return redirect('detalle_denuncia', id_denuncia=id_denuncia)
 
 
-
+@login_required
 def crear_denuncia(request: HttpRequest):
     denuncia_form = DenunciaForm()
-    creado = False
-    # if request.method == 'POST':
-    #     denuncia_form = DenunciaForm(request.POST)
-    #     if denuncia_form.is_valid():
-    #         denuncia = denuncia_form.save()
-    #         creado = True
-    context = {'denuncia_form':denuncia_form, 'creado':creado}
+    if request.method == 'POST':
+        denuncia_form = DenunciaForm(request.POST)
+        id_programa = request.POST.get('programa')
+        id_lugar = request.POST.get('lugarReferencia')
+        # en esta parte actualizo el queryset de mi formulario, ya que todavia esta none(), por que hago el filtrado en views
+        if id_programa:
+            denuncia_form.fields['programa'].queryset = ProgramaAcademico.objects.filter(id_programa=id_programa)
+        if id_lugar:
+            denuncia_form.fields['lugarReferencia'].queryset = LugarReferencia.objects.filter(id_lugar=id_lugar)
+        if denuncia_form.is_valid():
+            denuncia_form.save(request.user)
+            return redirect('muro_denuncias')
+        else:
+            print(denuncia_form.errors)
+    context = {'denuncia_form':denuncia_form}
     return render(request, 'crear_denuncia.html',context)
 
 
