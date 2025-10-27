@@ -7,6 +7,7 @@ from .utils import es_administrador
 from django.contrib import messages
 from .forms import DenuncianteForm
 from .forms import AdministradorForm
+from django.shortcuts import render, redirect
 
 def registrar_denunciante(request: HttpRequest):
     form = DenuncianteForm()
