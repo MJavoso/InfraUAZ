@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block titulo %}Panel de Administrador - UAZ{% endblock titulo %}
+
+{% block contenido %}
+
+{% include "nav_bar.html" %}
+
+<!-- Estilos -->
+<link rel="stylesheet" href="{% static 'css/panel.css' %}">
+<!-- Contenedor principal -->
+<div class="container-fluid px-4 py-3">
+
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <h2 class="text-primary fw-bold">Panel de Administrador</h2>
+        <h4 class="text-secondary">Gestión y seguimiento de denuncias del campus UAZ Siglo XXI</h4>
+    </div>
+
+    <!-- Tarjetas de resumen -->
+    <div class="row g-3 mb-4 text-center">
+        <!-- Total de denuncias-->
+        <div class="col-6 col-md-4">
+            <div class="card border-0 shadow-sm p-3">
+                <h5 class="fw-bold mb-0">12</h5>
+                <p class="text-muted mb-0">Total</p>
+                <div class="fs-3 text-secondary"><i class="bi bi-file-earmark-text"></i></div>
+            </div>
+        </div>
+
+        <!-- Denuncias por estado -->
+        <div class="col-6 col-md-2">
+            <div class="card border-0 shadow-sm p-3">
+                <h5 class="fw-bold mb-0 text-warning">2</h5>
+                <p class="text-muted mb-0">Pendientes</p>
+                <div class="fs-3 text-warning"><i class="bi bi-exclamation-triangle"></i></div>
+            </div>
+        </div>
+        <div class="col-6 col-md-2">
+            <div class="card border-0 shadow-sm p-3">
+                <h5 class="fw-bold mb-0 text-warning">5</h5>
+                <p class="text-muted mb-0">En Revisión</p>
+                <div class="fs-3 text-warning"><i class="bi bi-clock-history"></i></div>
+            </div>
+        </div>
+        <div class="col-6 col-md-2">
+            <div class="card border-0 shadow-sm p-3">
+                <h5 class="fw-bold mb-0 text-primary">4</h5>
+                <p class="text-muted mb-0">Resueltas</p>
+                <div class="fs-3 text-primary"><i class="bi bi-check-circle"></i></div>
+            </div>
+        </div>
+        <div class="col-6 col-md-2">
+            <div class="card border-0 shadow-sm p-3">
+                <h5 class="fw-bold mb-0 text-danger">1</h5>
+                <p class="text-muted mb-0">Canceladas</p>
+                <div class="fs-3 text-danger"><i class="bi bi-x-circle"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de contenido -->
+    <div class="row">
+        <!-- Navegación lateral -->
+        <div class="col-12 col-md-3">
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <h6 class="fw-bold text-primary mb-3">NAVEGACIÓN</h6>
+                    <div class="list-group">
+                        <!-- Aqui cuando se presiona se redirecciona a la sección de gestión de denuncias-->
+                        <a href="#" class="list-group-item list-group-item-action active">
+                            <i class="bi bi-clipboard-data me-2"></i> Gestión de Denuncias
+                        </a>
+                        <!-- Aqui cuando se presiona se redirecciona a la sección de gestión de administradores-->
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="bi bi-people me-2"></i> Gestión de Administradores
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel principal -->
+        <div class="col-12 col-md-9">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white fw-semibold d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-funnel me-2"></i> Filtros</span>
+                    <span class="badge bg-light text-dark">12 de 12</span>
+                </div>
+
+                <div class="card-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" placeholder="ID, tipo, ubicación...">
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select">
+                                <option selected>Estado: Todos</option>
+                                <option>Pendiente</option>
+                                <option>En revisión</option>
+                                <option>Resuelta</option>
+                                <option>Cancelada</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select">
+                                <option selected>Tipo de incidente: Todos</option>
+                                <option>Infraestructura</option>
+                                <option>Mantenimiento</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de denuncias -->
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Denunciante</th>
+                                    <th>Tipo</th>
+                                    <th>Descripción</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <!-- Lista de denuncias -->
+                            <tbody>
+                                {% for denuncia in denuncias %}
+                                <tr>
+                                    <td>{{ denuncia.título }}</td>
+                                    <td>{{ denuncia.id_denunciante.usuario.nombre }}</td>
+                                    <td>{{ denuncia.id_tipo_denuncia.descripcion }}</td>
+                                    <td>{{ denuncia.descripcion|truncatechars:60 }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if denuncia.id_estado.estado == 'Pendiente' %}
+                                                bg-warning text-dark
+                                            {% elif denuncia.id_estado.estado == 'En revisión' %}
+                                                bg-info text-dark
+                                            {% elif denuncia.id_estado.estado == 'Resuelta' %}
+                                                bg-success
+                                            {% elif denuncia.id_estado.estado == 'Cancelada' %}
+                                                bg-danger
+                                            {% else %}
+                                                bg-secondary
+                                            {% endif %}">
+                                            {{ denuncia.id_estado.estado }}
+                                        </span>
+                                    </td>
+                                    <td>{{ denuncia.fecha|date:"d/m/Y" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-muted text-center">No hay denuncias registradas</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock contenido %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock scripts %}
