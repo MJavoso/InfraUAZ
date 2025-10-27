@@ -1,9 +1,5 @@
 from django.shortcuts import render, redirect
 from django.http import HttpRequest
-from .forms import DenuncianteForm
-from django.contrib import messages
-from .forms import AdministradorForm
-from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from .forms import DenuncianteForm, LoginForm, AdministradorForm
 from .models import Usuario
