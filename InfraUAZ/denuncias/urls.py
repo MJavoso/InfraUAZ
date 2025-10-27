@@ -11,9 +11,4 @@ urlpatterns = [
 
     path('programas/<int:id_edificio>/', views.filtrar_programas_por_edificio, name='filtrar_programas_por_edificio'),
     path('lugar_referencia/<int:id_programa>/<int:id_tipolugar>/', views.lugar_referencia, name='lugar_referencia'),
-    # El <int:id_denuncia> hace que la url muestre el id de la denuncia 
-    # despues del nombre de la ruta, por ejemplo: /detalle-denuncia/5/--> 5 es el id de la denuncia
-    path('detalle-denuncia/<int:id_denuncia>/', views.detalle_denuncia, name='detalle_denuncia'),
-    path('denuncia/<int:id_denuncia>/agregar-insumo/', views.agregar_insumo, name='agregar_insumo'),
-
 ]
