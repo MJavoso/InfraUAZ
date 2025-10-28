@@ -12,12 +12,17 @@ Crear cuenta
         <div class="create-account-header">
             <h2>Crear cuenta</h2>
             <p>Regístrate para reportar incidencias en el campus</p>
-            
-            {% if creado %}
-                <p>Usuario creado</p>
-            {% endif %}
         </div>
         <form method="post" class="flex-col base-form">
+            
+            {% if denunciante_form.non_field_errors %}
+                <div class="alert alert-danger">
+                    
+                    {% for error in denunciante_form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
             {% csrf_token %}
             <div class="form-element flex-col">
                 {{ denunciante_form.nombre.label_tag }}
