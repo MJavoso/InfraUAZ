@@ -7,17 +7,6 @@ from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView
 
-def muro_denuncias(request):
-    # Obtener todas las denuncias con sus relaciones necesarias para evitar consultas adicionales
-    denuncias = Denuncia.objects.select_related(
-        # Incluir las relaciones necesarias para optimizar las consultas
-        'id_estado', 
-        'id_lugar__id_programa__id_edificio', 
-        'id_tipo_denuncia'
-    ).order_by('-fecha') # Ordenar por fecha descendente
-    # Renderizar la plantilla con las denuncias obtenidas
-    return render(request, 'muro_denuncias.html', {'denuncias': denuncias})
-
 #------------------ Vista de detalle de denuncia ------------------#
 def detalle_denuncia(request, id_denuncia):
     # Obtener la denuncia por su ID o devolver un error 404 si no existe
