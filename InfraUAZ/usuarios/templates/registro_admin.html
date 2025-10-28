@@ -3,45 +3,11 @@
 {% block title %}Agregar Administrador{% endblock %}
 
 {% block content %}
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> b300f12 (Cuadro de dialogo CU-08 hecho.)
 <div class="text-center mt-5">
  
 </div>
 
 <!-- Modal de administrador -->
-<<<<<<< HEAD
-=======
->>>>>>> ff902cc (Ignoren este cambio)
-=======
->>>>>>> b300f12 (Cuadro de dialogo CU-08 hecho.)
-=======
-=======
->>>>>>> d109600 (CU-08 realizado (cuadro de dialogo))
-<!-- Botón para abrir el cuadro de dialogo (solo fue una prueba)-->
-=======
->>>>>>> 6e48699 (Cuadro de dialogo CU-08 hecho.)
-<div class="text-center mt-5">
- 
-</div>
-
-<<<<<<< HEAD
-<!-- Cuadro de dialogo -->
-<<<<<<< HEAD
->>>>>>> 5752a1f (CU-08 realizado (cuadro de dialogo))
-=======
->>>>>>> dc8fd72 (Ignoren este cambio)
-=======
->>>>>>> d109600 (CU-08 realizado (cuadro de dialogo))
-=======
-<!-- Modal de administrador -->
->>>>>>> 6e48699 (Cuadro de dialogo CU-08 hecho.)
 <div class="modal show d-block" id="adminModal" tabindex="-1" aria-labelledby="adminModalLabel" aria-hidden="false" style="background-color: rgba(0,0,0,0.5);">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content shadow-lg border-0 rounded-4">
@@ -50,17 +16,6 @@
         <h5 class="modal-title fw-bold" id="modalAdminLabel">
           <i class="bi bi-person-plus me-2 text-primary"></i> Agregar Nuevo Administrador
         </h5>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
->>>>>>> 5752a1f (CU-08 realizado (cuadro de dialogo))
-=======
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
->>>>>>> d109600 (CU-08 realizado (cuadro de dialogo))
-=======
->>>>>>> 6e48699 (Cuadro de dialogo CU-08 hecho.)
       </div>
 
       <div class="modal-body">
@@ -68,17 +23,7 @@
           Complete los datos del nuevo administrador del sistema
         </p>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
         <!-- Mensajes generales -->
-=======
-        <!-- Mensajes de éxito o error -->
->>>>>>> dc8fd72 (Ignoren este cambio)
-=======
-        <!-- Mensajes generales -->
->>>>>>> 6e48699 (Cuadro de dialogo CU-08 hecho.)
         {% if messages %}
           {% for message in messages %}
             <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
@@ -87,8 +32,6 @@
           {% endfor %}
         {% endif %}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         <!-- Formulario -->
         <form method="post">
           {% csrf_token %}
@@ -124,81 +67,6 @@
             {{ form.programa_academico.label_tag }} <span class="text-danger">*</span>
             {{ form.programa_academico }}
             {{ form.programa_academico.errors }}
-=======
-=======
-        <!-- Formulario Django -->
->>>>>>> dc8fd72 (Ignoren este cambio)
-=======
-        <!-- Formulario -->
->>>>>>> 6e48699 (Cuadro de dialogo CU-08 hecho.)
-        <form method="post">
-          {% csrf_token %}
-
-          <!-- Errores no asociados que no van a un campo específico -->
-          {{ form.non_field_errors }}
-
-          <div class="mb-3">
-            {{ form.nombre.label_tag }} <span class="text-danger">*</span>
-            {{ form.nombre }}
-            {{ form.nombre.errors }}
-          </div>
-
-          <div class="mb-3">
-            {{ form.correo.label_tag }} <span class="text-danger">*</span>
-            {{ form.correo }}
-            {{ form.correo.errors }}
-          </div>
-
-          <div class="mb-3">
-            {{ form.contrasena.label_tag }} <span class="text-danger">*</span>
-            {{ form.contrasena }}
-            {{ form.contrasena.errors }}
-          </div>
-
-          <div class="mb-3">
-<<<<<<< HEAD
-<<<<<<< HEAD
-            <label class="form-label fw-semibold">Confirmar contraseña <span class="text-danger">*</span></label>
-            <input type="password" class="form-control" placeholder="Repite la contraseña" required>
->>>>>>> 5752a1f (CU-08 realizado (cuadro de dialogo))
-=======
-            {{ form.confirmar_contrasena.label_tag }}
-            {{ form.confirmar_contrasena }}
-            {{ form.confirmar_contrasena.errors }}
->>>>>>> dc8fd72 (Ignoren este cambio)
-=======
-        <form method="post">
-          {% csrf_token %}
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Nombre completo <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" placeholder="Ej: Juan Pérez García" required>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Correo institucional <span class="text-danger">*</span></label>
-            <input type="email" class="form-control" placeholder="correo@uaz.edu.mx" required>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Contraseña <span class="text-danger">*</span></label>
-            <input type="password" class="form-control" placeholder="Mínimo 6 caracteres" minlength="6" required>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Confirmar contraseña <span class="text-danger">*</span></label>
-            <input type="password" class="form-control" placeholder="Repite la contraseña" required>
->>>>>>> d109600 (CU-08 realizado (cuadro de dialogo))
-=======
-            {{ form.confirmar_contrasena.label_tag }} <span class="text-danger">*</span>
-            {{ form.confirmar_contrasena }}
-            {{ form.confirmar_contrasena.errors }}
-          </div>
-
-          <div class="mb-3">
-            {{ form.programa_academico.label_tag }} <span class="text-danger">*</span>
-            {{ form.programa_academico }}
-            {{ form.programa_academico.errors }}
->>>>>>> 6e48699 (Cuadro de dialogo CU-08 hecho.)
           </div>
 
           <div class="d-flex justify-content-end mt-4">
@@ -210,20 +78,6 @@
             </button>
           </div>
         </form>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
->>>>>>> d109600 (CU-08 realizado (cuadro de dialogo))
-=======
->>>>>>> 6e48699 (Cuadro de dialogo CU-08 hecho.)
-=======
-
->>>>>>> adbf337 (Ignoren este cambio)
-=======
->>>>>>> 2d572c5 (CU-08 realizado (cuadro de dialogo))
       </div>
 
     </div>
