@@ -21,7 +21,7 @@
                 <a class="nav-link active" href="{% url 'muro_denuncias' %}">Inicio</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">Nueva Denuncia</a>
+                <a class="nav-link" href="{% url 'crear_denuncia' %}">Nueva Denuncia</a>
             </li>
 
             {% if request.user.is_authenticated %}
