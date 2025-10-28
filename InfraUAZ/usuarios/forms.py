@@ -60,17 +60,27 @@ class DenuncianteForm(forms.Form):
 
         return cleaned_data
     
-    def save(self):
+    def save(self) -> tuple[Usuario, Denunciante]:
         nombre = self.cleaned_data['nombre']
         correo = self.cleaned_data['correo']
         contrasena = self.cleaned_data['contrasena']
-        
-        if Usuario.objects.filter(correo=correo).first() is not None:
-            raise forms.ValidationError('El usuario ya existe')
+        usuario = Usuario.objects.filter(correo=correo).first()
+        if usuario is not None:
+            if not usuario.is_active:
+                denunciante = Denunciante.objects.filter(usuario=usuario).first()
+                raise forms.ValidationError(
+                    message='Usuario existente. Necesita activar su cuenta',
+                    code='user_exists',
+                    params={
+                        'denunciante_id': denunciante.id_denunciante
+                    }
+                )
+            else:
+                raise forms.ValidationError("El usuario ya existe.")
 
         usuario = Usuario.objects.create_user(correo=correo, nombre=nombre, contrasena=contrasena)
         denunciante = Denunciante.objects.create(usuario=usuario)
-        return denunciante
+        return (usuario, denunciante)
     
 
 #agregar administrador

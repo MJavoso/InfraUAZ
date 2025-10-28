@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %}
+
+{% if estado == 'email_sent' or estado == 'user_activated' %}
+    Éxito
+{% else %}
+    Error
+{% endif %}
+    
+{% endblock titulo %}
+
+
+{% block contenido %}
+{% include 'nav_bar.html' %}
+<main
+    class="flex-column d-flex align-self-center align-items-center justify-content-center flex-grow-1 w-md-50 w-75 p1">
+    
+    {% if estado == 'email_sent' %}
+    <div class="alert alert-success">
+        Se envío el correo electrónico de verificación a {{ correo }}.
+        Revisa tu carpeta de SPAM de ser necesario.<br>
+        Si no te llegó tu correo, da clic <a href="{% url 'reenviar_correo' uidb64=uidb64 %}">aquí</a> para reenviarlo.<br>
+        Da clic <a href="{% url 'login' %}">aquí</a> para dirigirte a la pantalla de iniciar sesión.
+    </div>
+    {% elif estado == 'user_activated' %}
+    <div class="alert alert-success">
+        Tu cuenta fue activada.
+        Puedes iniciar sesión <a href="{% url 'login' %}">aquí</a>.
+    </div>
+    {% elif estado == 'user_failed_activate' %}
+    <div class="alert alert-danger">
+        Hubo un error al activar tu cuenta. Por favor intenta más tarde.
+    </div>
+    {% elif estado == 'email_failed' %}
+    <div class="alert alert-danger">
+        Hubo un error al enviar el correo de activación.
+        Intenta de nuevo dando clic <a href="{% url 'reenviar_correo' uidb64=uidb64 %}">aquí</a>.
+    </div>
+    {% elif estado == 'user_exists' %}
+    <div class="alert alert-danger">
+        La cuenta existe, pero no está activa. Si no te ha llegado un correo, da clic
+        <a href="{% url 'reenviar_correo' uidb64=uidb64 %}">aquí</a> para reenviarlo.
+    </div>
+    {% elif estado == 'user_active' %}
+    <div class="alert alert-danger">
+        La cuenta ya está activa. Inicia sesión <a href="{% url 'login' %}">aquí</a>.
+    </div>
+    {% endif %}
+</main>
+{% endblock contenido %}
