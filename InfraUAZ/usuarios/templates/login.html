@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+
+{% block titulo %}
+Iniciar sesión
+{% endblock titulo %}
+
+
+{% block contenido %}
+{% include 'nav_bar.html' %}
+<main class="flex-column d-flex align-self-center align-items-center justify-content-center flex-grow-1 w-md-50 w-75 p1 login-body">
+    {% include 'login_header.html' %}
+    <section class="w-100 p-3 login-form bg-white">
+        <h1 class="fs-4">Seleccione su tipo de usuario</h1>
+
+        <a href="{% url 'login_denunciante' %}"
+            class="text-reset text-decoration-none mb-3 container border rounded p-3 d-flex flex-column flex-sm-row align-items-center hoverable-box">
+            <div class="border rounded bg-light-blue p-2">
+                <i class="bi bi-person fs-5 text-strong-blue"></i>
+            </div>
+            <div class="d-flex flex-column ms-2">
+                <p class="mb-1 fs-5">Denunciante</p>
+                <p class="mt-0 note-text">
+                    Estudiante, personal docente, etc.
+                </p>
+            </div>
+        </a>
+        <a href="{% url 'login_administrador' %}"
+            class="text-reset text-decoration-none mb-1 container border rounded p-3 d-flex flex-column flex-sm-row align-items-center hoverable-box">
+            <div class="border rounded bg-light-green p-2">
+                <i class="bi bi-shield fs-5 text-strong-green"></i>
+            </div>
+            <div class="d-flex flex-column ms-2">
+                <p class="mb-1 fs-5">Administrador</p>
+                <p class="mt-0 note-text">
+                    Personal autorizado para gestionar reportes
+                </p>
+            </div>
+        </a>
+        <hr>
+        {% include 'login_footer.html' %}
+    </section>
+</main>
+{% endblock contenido %}

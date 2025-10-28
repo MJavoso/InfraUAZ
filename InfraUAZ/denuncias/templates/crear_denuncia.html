@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %}
+    Crear denuncia
+{% endblock titulo %}
+    
+
+{% block contenido %}
+{% include 'nav_bar.html' %}
+<main class="bg-light d-flex align-items-center justify-content-center min-vh-100">
+        <!-- Contenedor centrado -->
+        <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8">
+            <div class="card shadow-lg">
+                <!-- Header -->
+                <div class="card-header text-white" style="background-color: #0066CC;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                    <i class="bi bi-file-text fs-4 me-2"></i>
+                    <div>
+                        <h5 class="card-title mb-1">Nueva Denuncia</h5>
+                        <small>Complete el formulario para reportar un incidente</small>
+                    </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-light btn-sm" onclick="onCancel()">
+                    <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body">
+                <form id="denunciaForm" method="post">
+                    {% csrf_token %}
+                    <!-- Detalles del Incidente -->
+                    <div class="mb-4 p-3 rounded" style="background-color: #FFF3E0;">
+                    <h6 class="fw-bold d-flex align-items-center mb-3">
+                        <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                        Detalles del Incidente
+                    </h6>
+
+                    <div class="mb-3">
+                        {{ denuncia_form.titulo.label_tag }}
+                        {{ denuncia_form.titulo }}
+                        {% for error in denuncia_form.titulo.errors %}
+                            <p class="text-danger">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ denuncia_form.descripcion.label_tag }}
+                        {{ denuncia_form.descripcion }}
+                        {% for error in denuncia_form.descripcion.errors %}
+                            <p class="text-danger">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="tipo_denuncia" class="form-label">Tipo de denuncia *</label>
+                        {{ denuncia_form.tipo_denuncia }}
+                    </div>
+
+                    <div class="mb-4 p-3 rounded" style="background-color: #F3F4F6;">
+                    <h6 class="fw-bold d-flex align-items-center mb-3">
+                        <i class="bi bi-camera-fill text-primary me-2"></i>
+                        Fotografías de Evidencia
+                    </h6>
+
+                    <div class="alert alert-info p-2">
+                        <p class="mb-1 fw-medium">Requisitos de las fotografías:</p>
+                        <ul class="mb-0">
+                        <li>Máximo 5 fotografías</li>
+                        <li>Tamaño máximo por foto: 5MB</li>
+                        <li>Formatos permitidos: PNG, JPEG, JPG</li>
+                        </ul>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Fotos cargadas: <strong id="photoCount" style="color: #1e40af;">0 / 5</strong></span>
+                        <input type="file" id="photo-upload" class="d-none" accept="image/png, image/jpeg, image/jpg" multiple>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('photo-upload').click()">
+                        <i class="bi bi-upload me-1"></i> Seleccionar Fotos
+                        </button>
+                    </div>
+
+                    <div id="photoList" class="list-group"></div>
+                    </div>
+
+                    <!-- Ubicación y Tiempo -->
+                    <div class="mb-4 p-3 rounded" style="background-color: #E8F5E8;">
+                    <h6 class="fw-bold d-flex align-items-center mb-3">
+                        <i class="bi bi-geo-fill text-primary me-2"></i>
+                        Ubicación y Tiempo
+                    </h6>
+
+                    <div class="mb-3">
+                        <label for="edificio" class="form-label">Edificio *</label>
+                        {{ denuncia_form.edificio }}
+                    </div>
+
+                    <div class="mb-3">
+                            <label for="programa" class="form-label">Programa Académico *</label>
+                            {{ denuncia_form.programa }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="tipoLugar" class="form-label">Tipo de Lugar *</label>
+                        {{ denuncia_form.tipo_lugar }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="lugarReferencia" class="form-label">Lugar de Referencia Específico *</label>
+                        {{ denuncia_form.lugarReferencia }}
+                    </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary me-2">Enviar</button>
+                    <button type="button" class="btn btn-secondary" onclick="onCancel()">Cancelar</button>
+                    </div>
+                </form>
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+        
+    
+</main>
+
+{% endblock contenido %}
+
+
+{% block scripts %}
+    <script>
+            document.getElementById('edificio').addEventListener('change', function() { 
+                const edificioId = this.value;
+                const programaSelect = document.getElementById('programa');
+
+                // Limpiar opciones anteriores
+                programaSelect.innerHTML = '<option value="">Seleccione el programa</option>';
+
+                if (edificioId) {
+                    fetch(`/programas/${edificioId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(programa => {
+                            const option = document.createElement('option');
+                            option.value = programa.id;       
+                            option.text = programa.nombre;    
+                            programaSelect.appendChild(option);
+                        });
+                    });
+                }
+            });
+    </script>
+            
+    <script>
+        document.getElementById('programa').addEventListener('change', filtrar_lugar_especifico);
+        document.getElementById('tipoLugar').addEventListener('change', filtrar_lugar_especifico);
+
+        function filtrar_lugar_especifico(){
+            const programaid = document.getElementById('programa').value;
+            const tipolugarid = document.getElementById('tipoLugar').value;
+            const lugarReferenciaSelect = document.getElementById('lugarReferencia');
+
+            lugarReferenciaSelect.innerHTML = '<option value="">Seleccione el lugar específico</option>';
+
+            if (programaid && tipolugarid){
+                fetch(`/lugar_referencia/${programaid}/${tipolugarid}/`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(lugar => {
+                        const option = document.createElement('option');
+                        option.value = lugar.id;
+                        option.text = lugar.nombre;
+                        lugarReferenciaSelect.appendChild(option);
+                    });
+                });
+            }
+        };
+    </script>
+{% endblock scripts %}
+    
+    

@@ -9,6 +9,9 @@ class UsuarioManager(BaseUserManager):
         correo = self.normalize_email(correo)
         user = self.model(correo=correo, nombre=nombre, **extra_fields)
         user.set_password(contrasena)
+        is_staff = extra_fields.get('is_staff', False)
+        if not is_staff:
+            user.is_active = False
         user.save(using=self._db)
         return user
     

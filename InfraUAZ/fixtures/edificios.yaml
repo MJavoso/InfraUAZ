@@ -1,0 +1,8 @@
+- model: denuncias.Edificio
+  pk: 1
+  fields:
+    nombre: Edificio E-12
+- model: denuncias.Edificio
+  pk: 2
+  fields:
+    nombre: Edificio E-13

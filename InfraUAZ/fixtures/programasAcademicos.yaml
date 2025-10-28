@@ -1,0 +1,15 @@
+- model: denuncias.ProgramaAcademico
+  pk: 1
+  fields:
+    nombre_programa: Ingeniería en Robótica y Mecatrónica
+    id_edificio: 1
+- model: denuncias.ProgramaAcademico
+  pk: 2
+  fields:
+    nombre_programa: Ingeniería de Software
+    id_edificio: 2
+- model: denuncias.ProgramaAcademico
+  pk: 3
+  fields:
+    nombre_programa: Ingeniería en Computación
+    id_edificio: 2
