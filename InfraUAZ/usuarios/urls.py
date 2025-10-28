@@ -7,10 +7,5 @@ urlpatterns = [
     path('login/denunciante', views.login_denunciante, name='login_denunciante'),
     path('login/administrador', views.login_administrador, name='login_administrador'),
     path('logout', views.logout, name='logout'),
-    path('registro-admin/', views.registro_admin, name='registro_admin')
-    path('login', views.login, name='login'),
-    path('login/denunciante', views.login_denunciante, name='login_denunciante'),
-    path('login/administrador', views.login_administrador, name='login_administrador'),
-    path('logout', views.logout, name='logout'),
-    path('registro-admin/', views.registro_admin, name='registro_admin')
+    path('registro-admin/', views.registro_admin, name='registro_admin'),
 ]
