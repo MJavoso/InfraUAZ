@@ -22,6 +22,21 @@ def registrar_denunciante(request: HttpRequest):
     }
     return render(request, 'crear_cuenta_denunciante.html', context=context)
 
+def registro_admin(request):
+    if request.method == "POST":
+        form = AdministradorForm(request.POST)
+        if form.is_valid():
+            form.save()  # <-- ahora hace todo internamente
+            messages.success(request, "Administrador agregado correctamente.")
+            return redirect('registro_admin')
+        else:
+            messages.error(request, "Por favor corrige los errores del formulario.")
+    else:
+        form = AdministradorForm()
+
+    return render(request, 'registro_admin.html', {'form': form})
+
+#k
 def login(request: HttpRequest):
     return render(request, 'login.html')
 
@@ -76,18 +91,3 @@ def login_administrador(request: HttpRequest):
 def logout(request):
     auth_logout(request)
     return redirect('login')
-
-#agregar administrador
-def registro_admin(request):
-    if request.method == "POST":
-        form = AdministradorForm(request.POST)
-        if form.is_valid():
-            form.save()  # <-- ahora hace todo internamente
-            messages.success(request, "Administrador agregado correctamente.")
-            return redirect('registro_admin')
-        else:
-            messages.error(request, "Por favor corrige los errores del formulario.")
-    else:
-        form = AdministradorForm()
-
-    return render(request, 'registro_admin.html', {'form': form})
