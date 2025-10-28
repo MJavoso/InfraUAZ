@@ -71,37 +71,6 @@ class DenuncianteForm(forms.Form):
         usuario = Usuario.objects.create_user(correo=correo, nombre=nombre, contrasena=contrasena)
         denunciante = Denunciante.objects.create(usuario=usuario)
         return denunciante
-
-class LoginForm(forms.Form):
-    correo = forms.CharField(
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control bg-light",
-                "placeholder": "usuario@uaz.edu.mx"
-            }
-        ),
-        label="Correo electrónico",
-        validators=[validar_correo_uaz]
-    )
-
-    contrasena = forms.CharField(
-        widget=forms.PasswordInput(
-            attrs={
-                "class": "form-control bg-light",
-                "placeholder": "••••••••"
-            }
-        )
-    )
-
-    recordarme = forms.BooleanField(
-        label='Recordarme',
-        required=False,
-        widget=forms.CheckboxInput(
-            attrs={
-                "class": "form-check-input"
-            }
-        )
-    )
     
 
 #agregar administrador
@@ -164,3 +133,34 @@ class AdministradorForm(forms.Form):
         )
 
         return admin
+
+class LoginForm(forms.Form):
+    correo = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control bg-light",
+                "placeholder": "usuario@uaz.edu.mx"
+            }
+        ),
+        label="Correo electrónico",
+        validators=[validar_correo_uaz]
+    )
+
+    contrasena = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control bg-light",
+                "placeholder": "••••••••"
+            }
+        )
+    )
+
+    recordarme = forms.BooleanField(
+        label='Recordarme',
+        required=False,
+        widget=forms.CheckboxInput(
+            attrs={
+                "class": "form-check-input"
+            }
+        )
+    )
