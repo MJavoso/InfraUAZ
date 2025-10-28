@@ -21,7 +21,7 @@
                 <a class="nav-link active" href="{% url 'muro_denuncias' %}">Inicio</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">Nueva Denuncia</a>
+                <a class="nav-link" href="{% url 'crear_denuncia' %}">Nueva Denuncia</a>
             </li>
 
             {% if request.user.is_authenticated %}
@@ -31,15 +31,6 @@
             {% endif %}
 
             {% if request.user.is_authenticated %}
-            <li class="nav-item mt-2 mt-lg-0">
-                <p>{{ request.user.nombre }}</p>
-            </li>
-            <li class="nav-item mt-2 mt-lg-0">
-                <a href="{% url 'logout' %}" class="btn btn-primary text-white w-100 w-lg-auto">
-                    <i class="bi bi-box-arrow-right text-white"></i>
-                </a>
-            </li>
-            {% else %}
             <li class="nav-item mt-2 mt-lg-0">
                 <p>{{ request.user.nombre }}</p>
             </li>
