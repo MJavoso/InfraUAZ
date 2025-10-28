@@ -41,15 +41,6 @@
             </li>
             {% else %}
             <li class="nav-item mt-2 mt-lg-0">
-                <p>{{ request.user.nombre }}</p>
-            </li>
-            <li class="nav-item mt-2 mt-lg-0">
-                <a href="{% url 'logout' %}" class="btn btn-primary text-white w-100 w-lg-auto">
-                    <i class="bi bi-box-arrow-right text-white"></i>
-                </a>
-            </li>
-            {% else %}
-            <li class="nav-item mt-2 mt-lg-0">
                 <a class="btn btn-primary text-white w-100 w-lg-auto" href="{% url 'login' %}">Iniciar Sesión</a>
             </li>
             {% endif %}
