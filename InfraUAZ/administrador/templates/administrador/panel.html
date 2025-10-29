@@ -95,12 +95,12 @@
                             <input type="text" class="form-control" placeholder="ID, tipo, ubicación...">
                         </div>
                         <div class="col-md-4">
-                            <select class="form-select">
-                                <option selected>Estado: Todos</option>
-                                <option>Pendiente</option>
-                                <option>En revisión</option>
-                                <option>Resuelta</option>
-                                <option>Cancelada</option>
+                            <select name="estado" class="form-select" onchange="this.form.submit()">
+                                <option {% if estado_filtro == 'Todos' %}selected{% endif %}>Todos</option>
+                                <option {% if estado_filtro == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                                <option {% if estado_filtro == 'En revisión' %}selected{% endif %}>En revisión</option>
+                                <option {% if estado_filtro == 'Resuelta' %}selected{% endif %}>Resuelta</option>
+                                <option {% if estado_filtro == 'Cancelada' %}selected{% endif %}>Cancelada</option>
                             </select>
                         </div>
                         <div class="col-md-4">
