@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView
-
+from django.core.paginator import Paginator
 #------------------ Vista de detalle de denuncia ------------------#
 def detalle_denuncia(request, id_denuncia):
     # Obtener la denuncia por su ID o devolver un error 404 si no existe
@@ -73,9 +73,30 @@ def lugar_referencia(request, id_programa, id_tipolugar):
 class DenunciasListView(ListView):
     model=Denuncia
     template_name = 'muro_denuncias.html'
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):
         context =  super().get_context_data(**kwargs)
         context['tipo_denuncia'] = TipoDenuncia.objects.all()
         context['estado_denuncia'] = EstadoDenuncia.objects.all()
+        context['cant_pendientes'] = Denuncia.objects.filter(id_estado = 1).count()
+        context['cant_revision'] = Denuncia.objects.filter(id_estado = 2).count()
+        context['cant_resueltas'] = Denuncia.objects.filter(id_estado = 3).count()
+
+
         return context
+
+
+def filtrar_denuncia(request,id_tipo_denuncia, id_estado, fechai, fechaf):  
+    denuncias = Denuncia.objects.all()
+    if id_tipo_denuncia != 0:
+        denuncias = denuncias.filter(id_tipo_denuncia=id_tipo_denuncia)
+    if id_estado != 0:
+        denuncias = denuncias.filter(id_estado = id_estado)
+    if fechai != "null" and fechaf !="null":
+        denuncias = denuncias.filter(fecha__range=(fechai, fechaf))
+    
+    data = [{'titulo':d.título, 'descripcion': d.descripcion, 'edificio': d.id_lugar.id_programa.id_edificio.nombre, 'tipo':d.id_tipo_denuncia.descripcion ,
+             'lugar':d.id_lugar.nombre_lugar, 'estado':d.id_estado.estado, 'fecha':d.fecha }for d in denuncias]
+    
+    return JsonResponse(data, safe=False)

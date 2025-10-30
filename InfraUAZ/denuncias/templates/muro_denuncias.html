@@ -12,45 +12,40 @@
 <!-- Contenido de la página -->
 {% block contenido %}
 
-        <!-- Barra de navegación -->
-        {% include "nav_bar.html" %}
+<!-- Barra de navegación -->
+{% include "nav_bar.html" %}
         
-<!-- Contenedor principal -->
-<div class="container-fluid text-center px-0">
-    <div class="row mx-0">
-        <div class="row text-start px-4">
-            <h4 class="text-primary">Sistema de Reportes de Incidentes</h4>
-            <p class="text-muted">Campus UAZ Siglo XXI – Consulta y filtra las denuncias registradas.</p>
-        </div>
-
-        <!-- Tarjetas de resumen -->
-        <div class="col-6 col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <div class="fs-3 text-warning">⚠</div>
-                    <h3 class="fw-bold mb-0">4</h3>
-                    <p class="text-muted mb-0">Pendientes</p>
-                </div>
+<!-- Tarjetas de resumen -->
+<div class="row g-4 justify-content-center my-4">
+    <!-- Pendientes -->
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <div class="fs-3 text-warning">⚠</div>
+                <h3 class="fw-bold">{{ cant_pendientes }}</h3>
+                <p class="text-muted mb-0">Pendientes</p>
             </div>
         </div>
+    </div>
 
-        <div class="col-6 col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <div class="fs-3 text-primary">⏱</div>
-                    <h3 class="fw-bold mb-0">4</h3>
-                    <p class="text-muted mb-0">En revisión</p>
-                </div>
+    <!-- En proceso -->
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <div class="fs-3 text-primary">⏱</div>
+                <h3 class="fw-bold">{{ cant_revision }}</h3>
+                <p class="text-muted mb-0">En proceso</p>
             </div>
         </div>
+    </div>
 
-        <div class="col-6 col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <div class="fs-3 text-success">✅</div>
-                    <h3 class="fw-bold mb-0">5</h3>
-                    <p class="text-muted mb-0">Resueltas</p>
-                </div>
+    <!-- Resueltas -->
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <div class="fs-3 text-success">✅</div>
+                <h3 class="fw-bold">{{ cant_resueltas }}</h3>
+                <p class="text-muted mb-0">Resueltas</p>
             </div>
         </div>
     </div>
@@ -70,7 +65,9 @@
                 <select id="tipo_denuncia" name="tipo_denuncia" class="form-select">
                     <option value="">Seleccione un tipo</option>
                     {% for tipo in tipo_denuncia %}
-                        <option value="{{ tipo.id_tipo_denuncia }}">{{ tipo.descripcion }}</option>
+                        <option value="{{ tipo.id_tipo_denuncia }}"
+                         {% if filtro_tipo_denuncia == tipo.id_tipo_denuncia|stringformat:"s" %}selected{% endif %}>
+                         {{ tipo.descripcion }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -89,8 +86,8 @@
 
             <div class="mb-3">
                 <label class="form-label fw-semibold">Rango de fechas</label>
-                <input type="date" class="form-control mb-2">
-                <input type="date" class="form-control mb-2">
+                <input type="date" class="form-control mb-2" id="fechai">
+                <input type="date" class="form-control mb-2" id="fechaf">
                 <button class="btn btn-outline-secondary w-100" onclick="limpiarFiltro()">Limpiar filtros</button>
             </div>
         </div>
@@ -104,7 +101,7 @@
                 Denuncias recientes
             </div>
 
-            <div class="card-body" style="max-height: 420px; overflow-y: auto;">
+            <div class="card-body" id="lista-denuncias"style="max-height: 420px; overflow-y: auto;">
                 {% for denuncia in object_list %}
                 <a href="{% url 'detalle_denuncia' denuncia.id_denuncia %}" 
                    class="text-decoration-none text-dark">
@@ -139,24 +136,51 @@
             </div>
 
             <!-- Paginación -->
-            <div class="card-footer bg-white">
+            {% if is_paginated %}
+            <div class="card-footer bg-white mt-4">
                 <nav aria-label="Paginación de denuncias">
                     <ul class="pagination justify-content-center mb-0">
-                        <li class="page-item disabled">
-                            <a class="page-link">Anterior</a>
-                        </li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Siguiente</a>
-                        </li>
+                        <!-- Botón Anterior -->
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link">Anterior</a>
+                            </li>
+                        {% endif %}
+                        
+                        <!-- Números de página -->
+                        {% for num in paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <a class="page-link" href="#">{{ num }}</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        <!-- Botón Siguiente -->
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link">Siguiente</a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </nav>
             </div>
+            {% endif %}
+            </div>
         </div>
     </div>
-</div>
 {% endblock contenido %}
 
 {% block scripts %}
@@ -169,5 +193,56 @@
         }
     </script>
     
+    <script>
+        document.getElementById('tipo_denuncia').addEventListener('change', filtrarDenuncias);
+        document.getElementById('estado').addEventListener('change', filtrarDenuncias);
+        document.getElementById('fechai').addEventListener('change',filtrarDenuncias);
+        document.getElementById('fechaf').addEventListener('change',filtrarDenuncias);
+
+        function filtrarDenuncias() {
+            const idTipoDenuncia = parseInt(document.getElementById('tipo_denuncia').value) || 0;
+            const idEstado = parseInt(document.getElementById('estado').value) || 0;
+            const fechai = document.getElementById('fechai').value || "null";
+            const fechaf = document.getElementById('fechaf').value || "null";
+            const contenedor = document.getElementById('lista-denuncias');
+
+            // Verifica si hay al menos un filtro activo
+            if (idTipoDenuncia !== 0 || idEstado !== 0 || (fechai!=="null" && fechaf!=="null")) {
+                fetch(`/filtrar_denuncia/${idTipoDenuncia}/${idEstado}/${fechai}/${fechaf}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        contenedor.innerHTML = '';
+
+                        if (data.length === 0) {
+                            contenedor.innerHTML = '<p class="text-muted">No hay denuncias que coincidan con los filtros.</p>';
+                            return;
+                        }
+
+                        data.forEach(d => {
+                            const card = `<a  class="text-decoration-none text-dark">
+                                <div class="mb-3 p-3 border rounded bg-white hover-shadow-sm denuncia-card">
+                                    <h6 class="fw-semibold">
+                                        ${d.titulo}
+                                        <span class="badge bg-primary ms-2">${d.tipo}</span>
+                                    </h6>
+                                    <p class="mb-1 text-muted">${d.descripcion.substring(0, 120)}...</p>
+                                    <small class="text-muted">
+                                        📍 ${d.edificio} – ${d.lugar} | ⚠ ${d.estado} | 📅 ${d.fecha}
+                                    </small>
+                                </div>
+                            </a>`;
+                            contenedor.innerHTML += card;
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error al filtrar denuncias:', error);
+                        contenedor.innerHTML = '<p class="text-danger">Ocurrió un error al cargar las denuncias.</p>';
+                    });
+            } else {
+                // Si no hay filtros, podrías limpiar o mostrar todas
+                contenedor.innerHTML = '<p class="text-muted">Seleccione un filtro para mostrar denuncias.</p>';
+            }
+        }
+        </script>
 
 {% endblock scripts %}
