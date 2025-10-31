@@ -1,8 +1,8 @@
-# Importacion para generar PDF
+# Importación para generar PDF
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
 from reportlab.lib.styles import getSampleStyleSheet
 # Importaciones para poner la fecha en el título PDF
 from datetime import datetime
@@ -35,50 +35,74 @@ def panel_administrador(request):
     # Renderizar la plantilla del panel con el contexto
     return render(request, 'administrador/panel.html', contexto)
 
-# Vista para generar el PDF del boton 'reporte de denuncias' 
+
+# Vista para generar el PDF del botón 'reporte de denuncias'
 def generar_reporte_denuncias_pdf(request):
     # Crear la respuesta HTTP con tipo PDF
+    fecha_actual = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    # Nombre del archivo de reporte de denuncias con fecha incluida
+    nombre_archivo = f"reporte_denuncias_{fecha_actual}.pdf"
+    # HTTPResponse sirve para enviar el PDF como respuesta
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="reporte_denuncias.pdf"'
+    response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
 
     # Crear el documento PDF
-    # SimpleDocTemplate sirve para crear documentos PDF simples
-    registrar_Denuncia_PDF = SimpleDocTemplate(response, pagesize=letter)
+    buffer = BytesIO()
+    registrar_Denuncia_PDF = SimpleDocTemplate(buffer, pagesize=letter)
     elements = []
     styles = getSampleStyleSheet()
 
-    # Título del reporte
-    titlo_PDF = Paragraph("Reporte de Denuncias - UAZ Siglo XXI", styles['Title'])
-    elements.append(titlo_PDF)
-    elements.append(Spacer(1, 12))
+    # Título del reporte con fecha actual
+    titulo_reporte = Paragraph(f"Reporte de Denuncias - UAZ Siglo XXI<br/><font size=10>Generado el {datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}</font>", styles['Title'])
+    elements.append(titulo_reporte)
+    elements.append(Spacer(1, 20))
 
-    # Encabezados de la tabla
-    titulo_Columnas_Denuncia = [["Título", "Denunciante", "Tipo", "Descripción", "Estado", "Fecha"]]
-
-    # Agrega las denuncias a la tabla
+    # Obtener todas las denuncias ordenadas por fecha descendente
     denuncias = Denuncia.objects.all().order_by('-fecha')
+
+    # Generar una sección por denuncia
     for denuncia in denuncias:
-        titulo_Columnas_Denuncia.append([
-            denuncia.título,
-            denuncia.id_denunciante.usuario.nombre if denuncia.id_denunciante else "—",
-            denuncia.id_tipo_denuncia.descripcion if denuncia.id_tipo_denuncia else "—",
-            denuncia.descripcion[:60] + "..." if len(denuncia.descripcion) > 60 else denuncia.descripcion,
-            denuncia.id_estado.estado if denuncia.id_estado else "—",
-            denuncia.fecha.strftime("%d/%m/%Y")
-        ])
+        # Encabezado de denuncia
+        elements.append(Paragraph(f"<b>Título:</b> {denuncia.título}", styles['Heading2']))
+        elements.append(Spacer(1, 6))
+        elements.append(Paragraph(f"<b>Denunciante:</b> {denuncia.id_denunciante.usuario.nombre if denuncia.id_denunciante else '—'}", styles['Normal']))
+        elements.append(Paragraph(f"<b>Tipo de Denuncia:</b> {denuncia.id_tipo_denuncia.descripcion if denuncia.id_tipo_denuncia else '—'}", styles['Normal']))
+        elements.append(Paragraph(f"<b>Estado:</b> {denuncia.id_estado.estado if denuncia.id_estado else '—'}", styles['Normal']))
+        elements.append(Paragraph(f"<b>Fecha:</b> {denuncia.fecha.strftime('%d/%m/%Y')}", styles['Normal']))
+        elements.append(Spacer(1, 10))
+        elements.append(Paragraph(f"<b>Descripción:</b><br/>{denuncia.descripcion}", styles['Normal']))
+        elements.append(Spacer(1, 12))
 
-    # Crear tabla de denuncias
-    tabla_Denuncias = Table(titulo_Columnas_Denuncia, repeatRows=1)
-    # Estilo de la tabla
-    tabla_Denuncias.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#002855")),  # Color de fondo igual al azul de la UAZ
-        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
-        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-        ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
-        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.whitesmoke, colors.lightgrey])
-    ]))
+        # Tabla de insumos asociados (si los hay)
+        if hasattr(denuncia, 'insumo_set') and denuncia.insumo_set.exists():
+            elements.append(Paragraph("<b>Insumos Utilizados:</b>", styles['Heading3']))
+            datos_insumos = [["Nombre", "Cantidad", "Unidad"]]
+            for insumo in denuncia.insumo_set.all():
+                datos_insumos.append([
+                    insumo.nombre,
+                    str(insumo.cantidad),
+                    insumo.unidad if hasattr(insumo, 'unidad') else "—",
+                ])
 
-    elements.append(tabla_Denuncias)
+            tabla_insumos = Table(datos_insumos, repeatRows=1)
+            tabla_insumos.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#002855")),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.whitesmoke, colors.lightgrey]),
+            ]))
+            elements.append(tabla_insumos)
+        else:
+            elements.append(Paragraph("<i>No hay insumos registrados para esta denuncia.</i>", styles['Normal']))
+
+        # Salto de página para la siguiente denuncia
+        elements.append(PageBreak())
+
+    # Construir el PDF
     registrar_Denuncia_PDF.build(elements)
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
     return response
