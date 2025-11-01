@@ -4,7 +4,7 @@ from InfraUAZ.utils import str_to_bool
 
 DOMINIO_CORREO = 'uaz.edu.mx'
 
-_DISABLE_UAZ_EMAILS = str_to_bool(getenv('DISABLE_UAZ_EMAILS'))
+_DISABLE_UAZ_EMAILS = str_to_bool(getenv('DISABLE_UAZ_EMAILS')) and str_to_bool(getenv('DEBUG_MODE'))
 
 def validar_correo_uaz(correo: str):
     if _DISABLE_UAZ_EMAILS:
