@@ -21,6 +21,7 @@ services:
       SMTP_EMAIL: ${SMTP_EMAIL}
       SMTP_PASSWORD: ${SMTP_PASSWORD}
       DEBUG_MODE: ${DEBUG}
+      DISABLE_UAZ_EMAILS: ${DISABLE_UAZ_EMAILS}
 
   
   db:
