@@ -79,3 +79,7 @@ class DenunciasListView(ListView):
         context['tipo_denuncia'] = TipoDenuncia.objects.all()
         context['estado_denuncia'] = EstadoDenuncia.objects.all()
         return context
+
+def modal_denuncia(request):
+    #Despues se procesaran datos aqui
+    return render(request, 'reportes/modal_denuncia.html')
