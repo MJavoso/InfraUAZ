@@ -10,4 +10,6 @@ urlpatterns = [
     path('activar/<slug:uidb64>/<slug:token>', views.activar_cuenta, name='activar_cuenta'),
     path('crear-cuenta/correo/<slug:uidb64>', views.reenviar_correo_activacion, name='reenviar_correo'),
     path('registro-admin/', views.registro_admin, name='registro_admin'),
+    path('editar-admin', views.editar_admin),
+    path('actualizar-info-admin', views.actualizar_info_admin, name='actualizar_info_admin'),
 ]

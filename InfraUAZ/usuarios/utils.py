@@ -1,10 +1,13 @@
 from django.core.mail import EmailMultiAlternatives
 from django.urls import reverse
+from django.http import HttpRequest
+from django.http.response import HttpResponseForbidden
 from django.template.loader import render_to_string
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from enum import Enum
+from django.contrib.auth.decorators import login_required
 from .models import Administrador, Denunciante, Usuario
 
 class EmailStatus(Enum):
@@ -17,6 +20,14 @@ class EmailStatus(Enum):
 
 def es_administrador(id_usuario: int):
     return Administrador.objects.filter(pk=id_usuario).exists()
+
+def administrador_required(view_func):
+    @login_required
+    def wrapper(request: HttpRequest, *args, **kwargs):
+        if not request.user.is_staff:
+            return HttpResponseForbidden("No tienes permiso para acceder a esta página")
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
 def enviar_correo_activacion(dominio: str, correo: str, nombre: str, denunciante: Denunciante, usuario: Usuario):
     asunto = 'Activación de cuenta - InfraUAZ'
