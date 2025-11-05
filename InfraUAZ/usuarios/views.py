@@ -1,14 +1,17 @@
 from django.shortcuts import render, redirect
+from django import forms
+from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest
+from django.http.response import JsonResponse, HttpResponse
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from .forms import DenuncianteForm, LoginForm, AdministradorForm
+from .forms import DenuncianteForm, LoginForm, AdministradorForm, UpdateAdministradorForm
 from django.forms.forms import ValidationError
 from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
-from .models import Usuario, Denunciante
-from .utils import es_administrador, enviar_correo_activacion, activar_cuenta_denunciante, EmailStatus
+from .models import Usuario, Denunciante, Administrador
+from .utils import es_administrador, enviar_correo_activacion, activar_cuenta_denunciante, EmailStatus, administrador_required
 
 
 def registrar_denunciante(request: HttpRequest):
@@ -69,7 +72,7 @@ def registrar_denunciante(request: HttpRequest):
         print("Error al enviar el correo")
         return redireccion_fallo(denunciante.id_denunciante)
 
-
+@administrador_required
 def registro_admin(request):
     if request.method == "POST":
         form = AdministradorForm(request.POST)
@@ -148,7 +151,6 @@ def login_denunciante(request: HttpRequest):
     }
     return render(request, 'login_denunciante.html', context=context)
 
-
 def login_administrador(request: HttpRequest):
     form = LoginForm()
     error = None
@@ -172,7 +174,56 @@ def login_administrador(request: HttpRequest):
     }
     return render(request, 'login_administrador.html', context=context)
 
-
+@login_required
 def logout(request):
     auth_logout(request)
     return redirect('login')
+
+@administrador_required
+def editar_admin(request):
+    admin = Administrador.objects.filter(usuario__id=1).first() # temporal hasta que esté el panel para ver administradores
+    form = UpdateAdministradorForm(
+        initial={
+            'nombre': admin.usuario.nombre,
+            'correo': admin.usuario.correo,
+            'programa_academico': admin.programa_academico,
+            'estado_cuenta': admin.usuario.is_active,
+            'id_admin': admin.id_administrador
+        }
+    )
+    
+    context = {
+        "update_admin_form": form
+    }
+    return render(request, 'prueba_editar.html', context=context)
+
+@administrador_required
+def actualizar_info_admin(request: HttpRequest):
+    if request.method != "POST":
+        return HttpResponse(
+            status=405
+        )
+    
+    form = UpdateAdministradorForm(request.POST)
+    if not form.is_valid():
+        return JsonResponse(
+            data={
+                "errors": form.errors
+            },
+            status=400
+        )
+    try:
+        form.save()
+    except forms.ValidationError as e:
+        return JsonResponse(
+            data={
+                'errors': {
+                    'non_field_errors': e.message
+                }
+            },
+            status=400
+        )
+    return JsonResponse(
+        data={},
+        status=200
+    )
