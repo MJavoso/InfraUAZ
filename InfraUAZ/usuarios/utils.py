@@ -63,12 +63,15 @@ def activar_cuenta_denunciante(uid, token) -> EmailStatus:
         usuario = Denunciante.objects.get(pk=uid).usuario
     except (TypeError, ValueError, Denunciante.DoesNotExist):
         usuario = None
-    if usuario.is_active:
+    if usuario is None:
+        return EmailStatus.USER_FAILED_ACTIVATE
+    
+    if usuario.verificado:
         return EmailStatus.USER_ACTIVE
     
-    if usuario is not None and default_token_generator.check_token(usuario, token):
+    if default_token_generator.check_token(usuario, token):
         usuario.is_active = True
+        usuario.verificado = True
         usuario.save()
         return EmailStatus.USER_ACTIVATED
-    else:
-        return EmailStatus.USER_FAILED_ACTIVATE
+    return EmailStatus.USER_FAILED_ACTIVATE

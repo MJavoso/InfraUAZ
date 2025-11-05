@@ -16,9 +16,9 @@ from .utils import es_administrador, enviar_correo_activacion, activar_cuenta_de
 
 def registrar_denunciante(request: HttpRequest):
     # Función interna de registrar_denunciante para redireccionar a la ventana de estado_envio_correo.html
-    def redireccion_fallo(id_denunciante):
+    def redireccion_fallo(id_denunciante, estado=EmailStatus.EMAIL_FAILED):
         context = {
-            'estado': EmailStatus.EMAIL_FAILED.value,
+            'estado': estado.value,
             'uidb64': urlsafe_base64_encode(force_bytes(id_denunciante))
         }
         return render(request, 'estado_envio_correo.html', context=context)
@@ -43,13 +43,12 @@ def registrar_denunciante(request: HttpRequest):
         usuario, denunciante = form.save()
     except ValidationError as e:
         if e.code == "user_exists":
-            print("El denunciante ya existe")
+            print("El denunciante ya existe", flush=True)
             id_denunciante = e.params.get('denunciante_id')
-            return redireccion_fallo(id_denunciante)
+            return redireccion_fallo(id_denunciante, EmailStatus.USER_EXISTS)
         else:
-            print("Hay un error al guardar al usuario:", e.message)
+            print("Hay un error al guardar al usuario:", e.message, flush=True)
             form.add_error(None, e.message)
-            print(form)
             return redireccion_formulario(form)
 
     resultado = enviar_correo_activacion(
@@ -88,11 +87,11 @@ def registro_admin(request):
 
     return render(request, 'registro_admin.html', {'form': form})
 
-def reenviar_correo_activacion(request: HttpRequest, uidb64: int):
+def reenviar_correo_activacion(request: HttpRequest, uidb64):
     id_denunciante = int(urlsafe_base64_decode(uidb64))
     denunciante = Denunciante.objects.get(pk=id_denunciante)
     usuario = denunciante.usuario
-    if usuario.is_active:
+    if usuario.verificado:
         context = {
             'estado': EmailStatus.USER_ACTIVE.value,
         }
@@ -108,7 +107,8 @@ def reenviar_correo_activacion(request: HttpRequest, uidb64: int):
     if resultado:
         context = {
             'estado': EmailStatus.EMAIL_SENT.value,
-            'correo': usuario.correo
+            'correo': usuario.correo,
+            'uidb64': uidb64
         }
         return render(request, 'estado_envio_correo.html', context=context)
     else:

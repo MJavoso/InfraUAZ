@@ -66,7 +66,7 @@ class DenuncianteForm(forms.Form):
         contrasena = self.cleaned_data['contrasena']
         usuario = Usuario.objects.filter(correo=correo).first()
         if usuario is not None:
-            if not usuario.is_active:
+            if not usuario.verificado:
                 denunciante = Denunciante.objects.filter(usuario=usuario).first()
                 raise forms.ValidationError(
                     message='Usuario existente. Necesita activar su cuenta',
