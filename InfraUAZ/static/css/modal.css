@@ -1,0 +1,38 @@
+/* Fondo borroso cuando el modal está activo */
+.modal-backdrop.show {
+    backdrop-filter: blur(6px);
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Transición suave al abrir el modal */
+  .modal-content {
+    animation: fadeInUp 0.3s ease;
+    border-radius: 1rem;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      transform: translateY(30px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  /* Ajustes visuales */
+  .modal-header h5 {
+    display: flex;
+    align-items: center;
+  }
+  
+  .btn-danger {
+    background-color: #e60000;
+    border: none;
+  }
+  
+  .btn-danger:hover {
+    background-color: #cc0000;
+  }
+  
