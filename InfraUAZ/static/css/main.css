@@ -33,6 +33,10 @@ body {
     background-color: var(--create-account-blue-primary-light);
 }
 
+.bg-strong-blue {
+    background-color: var(--create-account-blue-bg);
+}
+
 .text-strong-blue {
     color: var(--create-account-blue-bg);
 }
@@ -62,10 +66,20 @@ body {
     box-shadow: 0.1rem 0.1rem 0.1rem black;
 }
 
+.spacing-2-end {
+    & > :not(:last-child) {
+        margin-right: 1rem;
+    }
+}
+
 @media (width >= 768px) {
     .w-md-50 {
         width: 50% !important;
     }
+}
+
+.hidden {
+    display: none;
 }
 
 /*

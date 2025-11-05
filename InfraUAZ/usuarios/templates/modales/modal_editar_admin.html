@@ -1,0 +1,69 @@
+{% load static %}
+
+<div class="modal fade" id="updateAdminModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex flex-column">
+                <button type="button" class="align-self-end btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="d-flex flex align-items-center w-100">
+                    <i class="bi bi-pencil-square text-strong-blue fs-4"></i>
+                    <h1 class="modal-title fs-4 fw-bold m-2">Editar administrador</h1>
+                </div>
+                <h3 class="fs-5 w-100 note-text">
+                    Modifique los datos del administrador
+                </h3>
+            </div>
+            <form class="modal-body" id="updateAdminForm">
+                {% csrf_token %}
+                {{ update_admin_form.id_admin }}
+                <div class="alert alert-danger hidden" id="globalErrors"></div>
+
+                <div class="alert alert-danger hidden" id="nombreErrors"></div>
+                <div class="mb-2 d-flex flex-column">
+                    <label for="{{ update_admin_form.nombre.id_for_label }}">
+                        {{ update_admin_form.nombre.label }}
+                    </label>
+                    {{ update_admin_form.nombre }}
+                </div>
+
+                <div class="alert alert-danger hidden" id="correoErrors"></div>
+                <div class="mb-2 d-flex flex-column">
+                    <label for="{{ update_admin_form.correo.id_for_label }}">
+                        {{ update_admin_form.correo.label }}
+                    </label>
+                    {{ update_admin_form.correo }}
+                </div>
+
+                <div class="alert alert-danger hidden" id="programaAcademicoErrors"></div>
+                <div class="mb-2 d-flex flex-column">
+                    <label for="{{ update_admin_form.programa_academico.id_for_label }}">
+                        {{ update_admin_form.programa_academico.label }}
+                    </label>
+                    {{ update_admin_form.programa_academico }}
+                </div>
+                <div class="mt-4 d-flex flex align-items-center border rounded p-2">
+                    <label class="form-check-label flex-grow-1" for="{{ update_admin_form.estado_cuenta.id_for_label }}">
+                        <p class="fw-bold m-0">{{ update_admin_form.estado_cuenta.label }}</p>
+                        <p class="note-text m-0">Cuenta activa</p>
+                    </label>
+                    <div class="form-check form-switch">
+                        {{ update_admin_form.estado_cuenta }}
+                    </div>
+                </div>
+                <hr>
+
+                <div class="alert alert-danger hidden" id="contrasenaErrors"></div>
+                <div class="d-flex flex-column">
+                    <label for="{{ update_admin_form.contrasena.id_for_label }}">{{ update_admin_form.contrasena.label }}</label>
+                    {{ update_admin_form.contrasena }}
+                </div>
+                <div class="modal-footer mt-4">
+                    <button type="reset" class="border-0 p-2 rounded-2" data-bs-dismiss="modal" aria-label="Cancel">Cancelar</button>
+                    <button type="submit" id="sendBtn" class="bg-strong-blue border-0 p-2 text-white rounded-2" aria-label="Send">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
