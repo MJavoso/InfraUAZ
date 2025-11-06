@@ -12,18 +12,21 @@ class UsuarioManager(BaseUserManager):
         is_staff = extra_fields.get('is_staff', False)
         if not is_staff:
             user.is_active = False
+            user.verificado = False
         user.save(using=self._db)
         return user
     
     def create_staff_user(self, correo, nombre, contrasena=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', False)
+        extra_fields.setdefault('verificado', True)
         return self.create_user(correo, nombre, contrasena, **extra_fields)
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     correo = models.EmailField(unique=True, max_length=100)
+    verificado = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 

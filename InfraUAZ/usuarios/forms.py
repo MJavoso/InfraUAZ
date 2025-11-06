@@ -66,7 +66,7 @@ class DenuncianteForm(forms.Form):
         contrasena = self.cleaned_data['contrasena']
         usuario = Usuario.objects.filter(correo=correo).first()
         if usuario is not None:
-            if not usuario.is_active:
+            if not usuario.verificado:
                 denunciante = Denunciante.objects.filter(usuario=usuario).first()
                 raise forms.ValidationError(
                     message='Usuario existente. Necesita activar su cuenta',
@@ -174,3 +174,53 @@ class LoginForm(forms.Form):
             }
         )
     )
+
+class UpdateAdministradorForm(forms.Form):
+    id_admin = forms.IntegerField(widget=forms.HiddenInput())
+    correo = forms.EmailField(
+        label="Correo Institucional *",
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'correo@uaz.edu.mx'}),
+        validators=[validar_correo_uaz]
+    )
+    nombre = forms.CharField(
+        label="Nombre completo *",
+        max_length=100,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Juan Perez García'})
+    )
+    contrasena = forms.CharField(
+        label="Reestablecer contraseña",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Nueva contraseña (mínimo 8 caracteres)'}),
+        min_length=8,
+        required=False
+    )
+    programa_academico = forms.ModelChoiceField(
+        label="Programa Académico *",
+        queryset=ProgramaAcademico.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    estado_cuenta = forms.BooleanField(
+        label="Estado de la cuenta",
+        required=False,
+        widget=forms.CheckboxInput(
+            attrs={
+                "class": "form-check-input",
+                "role": "switch"
+            }
+        )
+    )
+
+    def save(self):
+        administrador = Administrador.objects.filter(id_administrador=self.cleaned_data['id_admin']).first()
+        if administrador is None:
+            raise forms.ValidationError("Hubo un error al actualizar la información del administrador")
+        administrador.programa_academico = self.cleaned_data['programa_academico']
+        administrador.usuario.nombre = self.cleaned_data['nombre']
+        administrador.usuario.correo = self.cleaned_data['correo']
+        administrador.usuario.is_active = self.cleaned_data['estado_cuenta']
+
+        contrasena: str = self.cleaned_data.get('contrasena', '')
+        if len(contrasena) > 0:
+            administrador.usuario.set_password(contrasena)
+        
+        administrador.save()
+        administrador.usuario.save()

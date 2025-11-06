@@ -16,6 +16,7 @@ function make_migrations() {
     python manage.py makemigrations
   else
     for app in "$@"; do
+      echo "Ejecutando migración para $app"
       python manage.py makemigrations "$app"
     done
   fi
@@ -49,17 +50,17 @@ while [[ $# -gt 0 ]]; do
       all_fixtures
       shift
       ;;
+    --migrations=*)
+      MIGRATIONS_APPS="${1#--migrations=}"
+      MIGRATIONS_APPS=$(echo "$MIGRATIONS_APPS" | tr -d '"')
+      echo "Ejecutando migraciones para $MIGRATIONS_APPS"
+      for app in $MIGRATIONS_APPS; do
+        make_migrations "$app"
+      done
+      shift
+      ;;
     --migrations)
-      # Espera argumento tipo --migrations="app1 app2"
-      if [[ "$1" == *=* ]]; then
-        MIGRATIONS_APPS="${1#*=}"
-        MIGRATIONS_APPS=$(echo "$MIGRATIONS_APPS" | tr -d '"')
-        for app in $MIGRATIONS_APPS; do
-          make_migrations "$app"
-        done
-      else
-        make_migrations  # si no se pasó argumento, ejecuta global
-      fi
+      make_migrations  # si no se pasó argumento, ejecuta global
       shift
       ;;
     --runserver)

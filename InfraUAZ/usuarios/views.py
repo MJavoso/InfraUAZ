@@ -1,21 +1,24 @@
 from django.shortcuts import render, redirect
+from django import forms
+from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest
+from django.http.response import JsonResponse, HttpResponse
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from .forms import DenuncianteForm, LoginForm, AdministradorForm
+from .forms import DenuncianteForm, LoginForm, AdministradorForm, UpdateAdministradorForm
 from django.forms.forms import ValidationError
 from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
-from .models import Usuario, Denunciante
-from .utils import es_administrador, enviar_correo_activacion, activar_cuenta_denunciante, EmailStatus
+from .models import Usuario, Denunciante, Administrador
+from .utils import es_administrador, enviar_correo_activacion, activar_cuenta_denunciante, EmailStatus, administrador_required
 
 
 def registrar_denunciante(request: HttpRequest):
     # Función interna de registrar_denunciante para redireccionar a la ventana de estado_envio_correo.html
-    def redireccion_fallo(id_denunciante):
+    def redireccion_fallo(id_denunciante, estado=EmailStatus.EMAIL_FAILED):
         context = {
-            'estado': EmailStatus.EMAIL_FAILED.value,
+            'estado': estado.value,
             'uidb64': urlsafe_base64_encode(force_bytes(id_denunciante))
         }
         return render(request, 'estado_envio_correo.html', context=context)
@@ -40,13 +43,12 @@ def registrar_denunciante(request: HttpRequest):
         usuario, denunciante = form.save()
     except ValidationError as e:
         if e.code == "user_exists":
-            print("El denunciante ya existe")
+            print("El denunciante ya existe", flush=True)
             id_denunciante = e.params.get('denunciante_id')
-            return redireccion_fallo(id_denunciante)
+            return redireccion_fallo(id_denunciante, EmailStatus.USER_EXISTS)
         else:
-            print("Hay un error al guardar al usuario:", e.message)
+            print("Hay un error al guardar al usuario:", e.message, flush=True)
             form.add_error(None, e.message)
-            print(form)
             return redireccion_formulario(form)
 
     resultado = enviar_correo_activacion(
@@ -69,7 +71,7 @@ def registrar_denunciante(request: HttpRequest):
         print("Error al enviar el correo")
         return redireccion_fallo(denunciante.id_denunciante)
 
-
+@administrador_required
 def registro_admin(request):
     if request.method == "POST":
         form = AdministradorForm(request.POST)
@@ -85,11 +87,11 @@ def registro_admin(request):
 
     return render(request, 'registro_admin.html', {'form': form})
 
-def reenviar_correo_activacion(request: HttpRequest, uidb64: int):
+def reenviar_correo_activacion(request: HttpRequest, uidb64):
     id_denunciante = int(urlsafe_base64_decode(uidb64))
     denunciante = Denunciante.objects.get(pk=id_denunciante)
     usuario = denunciante.usuario
-    if usuario.is_active:
+    if usuario.verificado:
         context = {
             'estado': EmailStatus.USER_ACTIVE.value,
         }
@@ -105,7 +107,8 @@ def reenviar_correo_activacion(request: HttpRequest, uidb64: int):
     if resultado:
         context = {
             'estado': EmailStatus.EMAIL_SENT.value,
-            'correo': usuario.correo
+            'correo': usuario.correo,
+            'uidb64': uidb64
         }
         return render(request, 'estado_envio_correo.html', context=context)
     else:
@@ -148,7 +151,6 @@ def login_denunciante(request: HttpRequest):
     }
     return render(request, 'login_denunciante.html', context=context)
 
-
 def login_administrador(request: HttpRequest):
     form = LoginForm()
     error = None
@@ -172,7 +174,56 @@ def login_administrador(request: HttpRequest):
     }
     return render(request, 'login_administrador.html', context=context)
 
-
+@login_required
 def logout(request):
     auth_logout(request)
     return redirect('login')
+
+@administrador_required
+def editar_admin(request):
+    admin = Administrador.objects.filter(usuario__id=1).first() # temporal hasta que esté el panel para ver administradores
+    form = UpdateAdministradorForm(
+        initial={
+            'nombre': admin.usuario.nombre,
+            'correo': admin.usuario.correo,
+            'programa_academico': admin.programa_academico,
+            'estado_cuenta': admin.usuario.is_active,
+            'id_admin': admin.id_administrador
+        }
+    )
+    
+    context = {
+        "update_admin_form": form
+    }
+    return render(request, 'prueba_editar.html', context=context)
+
+@administrador_required
+def actualizar_info_admin(request: HttpRequest):
+    if request.method != "POST":
+        return HttpResponse(
+            status=405
+        )
+    
+    form = UpdateAdministradorForm(request.POST)
+    if not form.is_valid():
+        return JsonResponse(
+            data={
+                "errors": form.errors
+            },
+            status=400
+        )
+    try:
+        form.save()
+    except forms.ValidationError as e:
+        return JsonResponse(
+            data={
+                'errors': {
+                    'non_field_errors': e.message
+                }
+            },
+            status=400
+        )
+    return JsonResponse(
+        data={},
+        status=200
+    )

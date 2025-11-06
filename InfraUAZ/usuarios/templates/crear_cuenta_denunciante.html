@@ -7,52 +7,74 @@ Crear cuenta
 
 {% block contenido %}
 {% include 'nav_bar.html' %}
-<main class="full-container flex-col center-h">
+<main class="container flex-column d-flex align-items-center justify-content-center flex-grow-1 w-75 w-md-50 p-1 login-body">
     <div class="create-account-container flex-col center-h">
         <div class="create-account-header">
             <h2>Crear cuenta</h2>
             <p>Regístrate para reportar incidencias en el campus</p>
         </div>
         <form method="post" class="flex-col base-form">
-            
+
             {% if denunciante_form.non_field_errors %}
-                <div class="alert alert-danger">
-                    
-                    {% for error in denunciante_form.non_field_errors %}
-                        <p>{{ error }}</p>
-                    {% endfor %}
-                </div>
+            <div class="alert alert-danger">
+
+                {% for error in denunciante_form.non_field_errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
             {% endif %}
             {% csrf_token %}
             <div class="form-element flex-col">
+
+                {% if denunciante_form.nombre.errors %}
+                <div class="alert alert-danger">
+                    {% for error in denunciante_form.nombre.errors %}
+                    <p>{{error}}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
                 {{ denunciante_form.nombre.label_tag }}
                 {{ denunciante_form.nombre }}
             </div>
 
             <div class="form-element flex-col">
-                
-                {% for error in denunciante_form.correo.errors %}
-                    <p>{{error}}</p>
-                {% endfor %}
 
+                {% if denunciante_form.correo.errors %}
+                <div class="alert alert-danger">
+                    {% for error in denunciante_form.correo.errors %}
+                    <p>{{error}}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
                 {{ denunciante_form.correo.label_tag }}
                 {{ denunciante_form.correo }}
-            </div>
-
-            <div class="form-element flex-col">
-                {% for error in denunciante_form.contrasena.errors %}
-                    <p>{{error}}</p>
-                {% endfor %}
-
-                {{ denunciante_form.contrasena.label_tag }}
-                {{ denunciante_form.contrasena }}
                 <p class="note-text">Debe ser un correo institucional de la UAZ</p>
             </div>
 
             <div class="form-element flex-col">
-                {% for error in denunciante_form.contrasena.errors %}
+
+                {% if denunciante_form.contrasena.errors %}
+                <div class="alert alert-danger">
+                    {% for error in denunciante_form.contrasena.errors %}
                     <p>{{error}}</p>
-                {% endfor %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+
+                {{ denunciante_form.contrasena.label_tag }}
+                {{ denunciante_form.contrasena }}
+            </div>
+
+            <div class="form-element flex-col">
+
+                {% if denunciante_form.confirmar_contrasena.errors %}
+                <div class="alert alert-danger">
+                    {% for error in denunciante_form.confirmar_contrasena.errors %}
+                    <p>{{error}}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
 
                 {{ denunciante_form.confirmar_contrasena.label_tag }}
                 {{ denunciante_form.confirmar_contrasena }}

@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block titulo %}
+    Prueba
+{% endblock titulo %}
+    
+
+
+{% block contenido %}
+    {% include 'nav_bar.html' %}
+    {% include 'modales/modal_editar_admin.html' %}
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updateAdminModal">
+        Editar administrador
+    </button>
+{% endblock contenido %}
+
+
+{% block scripts %}
+    <script>
+        const errorBoxes = {
+            'global': document.getElementById("globalErrors"),
+            'nombre': document.getElementById("nombreErrors"),
+            'correo': document.getElementById("correoErrors"),
+            'programaAcademico': document.getElementById("programaAcademicoErrors"),
+            'contrasena': document.getElementById("contrasenaErrors")
+        };
+
+        function addErrors(errors) {
+            if ('non_field_errors' in errors) {
+                for (const error of errors.non_field_errors) {
+                    errorBoxes.global.classList.remove("hidden");
+                    const errorText = document.createElement("p");
+                    errorText.textContent = error;
+                    errorBoxes.global.appendChild(errorText);
+                }
+            }
+
+            for (const clave in errorBoxes) {
+                if (clave === 'global') {
+                    continue;
+                }
+
+                if (errors[clave] !== undefined) {
+                    for (const error of errors[clave]) {
+                        const errorText = document.createElement("p");
+                        errorText.textContent = error;
+                        errorBoxes[clave].appendChild(errorText);
+                    }
+                    errorBoxes[clave].classList.remove("hidden");
+                }
+            }
+        }
+
+        function clearErrors() {
+            for (const clave in errorBoxes) {
+                const box = errorBoxes[clave];
+                box.innerHTML = '';
+                box.classList.add("hidden");
+            }
+        }
+
+        const updateAdminForm = document.getElementById("updateAdminForm");
+        const sendBtn = document.getElementById("sendBtn");
+        sendBtn.addEventListener('click', function (event) {
+            event.preventDefault();
+            clearErrors();
+            const formData = new FormData(updateAdminForm);
+
+            fetch("{% url 'actualizar_info_admin' %}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value
+                }
+            })
+            .then(async (response) => {
+                return {
+                    "code": response.status,
+                    "body": await response.json()
+                };
+            })
+            .then((body) => {
+                if (body.code == 200) {
+                    const modalDiv = document.getElementById("updateAdminModal");
+                    const modal = bootstrap.Modal.getInstance(modalDiv);
+                    modal.hide();
+                    updateAdminForm.reset();
+                } else if (body.code == 405) {
+                    // Se usó otro método
+                } else if (body.code == 400) {
+                    const errors = body.body.errors;
+                    addErrors(errors);
+                }
+            })
+            .catch((error) => {
+                alert(error);
+            });
+        });
+    </script>
+{% endblock scripts %}
+    
