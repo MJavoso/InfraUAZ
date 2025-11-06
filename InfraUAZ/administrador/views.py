@@ -8,10 +8,31 @@ from reportlab.lib.styles import getSampleStyleSheet
 from datetime import datetime
 from io import BytesIO
 # Importar el modelo Denuncia y render
-from denuncias.models import Denuncia
+from denuncias.models import Denuncia, EstadoDenuncia, TipoDenuncia
 from django.shortcuts import render
+# ListView para la bandeja de entrada
+from django.views.generic import ListView
+from django.urls import reverse_lazy
+
+# Vista para la bandeja de entrada del administrador
+class DenunciasAdminListView(ListView):
+    # Obtener todas las denuncias
+    model=Denuncia
+    # Nombre de la plantilla
+    template_name = 'administrador/bandeja_entrada_admin.html'
+
+    # Contexto adicional para la plantilla
+    def get_context_data(self, **kwargs): # **kwargs permite pasar un número variable de argumentos clave-valor
+        context =  super().get_context_data(**kwargs)
+        context['tipo_denuncia'] = TipoDenuncia.objects.all()
+        context['estado_denuncia'] = EstadoDenuncia.objects.all()
+        return context
+# Asignar la vista a una variable para usar en urls.py
+
+bandeja_entrada_administrador = DenunciasAdminListView.as_view()
 
 # Vista para el panel de administrador
+@staff_member_required
 def panel_administrador(request):
     # Obtener denuncias pendientes por defecto
     denuncias = Denuncia.objects.filter(id_estado__estado='Pendiente')
@@ -37,6 +58,7 @@ def panel_administrador(request):
 
 
 # Vista para generar el PDF del botón 'reporte de denuncias'
+@staff_member_required
 def generar_reporte_denuncias_pdf(request):
     # Crear la respuesta HTTP con tipo PDF
     fecha_actual = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -106,3 +128,10 @@ def generar_reporte_denuncias_pdf(request):
     buffer.close()
     response.write(pdf)
     return response
+
+# Vista para el perfil del administrador
+def perfil_admin(request):
+    """
+    Muestra la información del perfil del administrador.
+    """
+    return render(request, 'administrador/perfil_admin.html')
