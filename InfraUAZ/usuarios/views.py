@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django import forms
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest
@@ -181,21 +181,28 @@ def logout(request):
 
 @administrador_required
 def editar_admin(request):
-    admin = Administrador.objects.filter(usuario__id=1).first() # temporal hasta que esté el panel para ver administradores
-    form = UpdateAdministradorForm(
-        initial={
-            'nombre': admin.usuario.nombre,
-            'correo': admin.usuario.correo,
-            'programa_academico': admin.programa_academico,
-            'estado_cuenta': admin.usuario.is_active,
-            'id_admin': admin.id_administrador
-        }
-    )
-    
+    admins = Administrador.objects.all()
+    form = UpdateAdministradorForm()
     context = {
+        "admins": admins,
         "update_admin_form": form
     }
     return render(request, 'prueba_editar.html', context=context)
+
+@administrador_required
+def detalle_admin(request, id_admin: int):
+    print(f"Id admin: {id_admin}", flush=True) 
+    admin = get_object_or_404(Administrador, pk=id_admin)
+
+    return JsonResponse(
+        data={
+            "id_admin": admin.id_administrador,
+            "nombre": admin.usuario.nombre,
+            "correo": admin.usuario.correo,
+            "programa_academico": admin.programa_academico.pk,
+            "estado_cuenta": admin.usuario.is_active
+        }
+    )
 
 @administrador_required
 def actualizar_info_admin(request: HttpRequest):
