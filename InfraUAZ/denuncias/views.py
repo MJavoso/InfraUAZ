@@ -98,7 +98,7 @@ def muro_denuncias(request: HttpRequest):
         id_tipo_denuncia = request.POST.get('tipo_denuncia')
         id_estado = request.POST.get('estado')
         fechai = request.POST.get('fechai')
-        fechaf = request.POST.get('fec|haf')
+        fechaf = request.POST.get('fechaf')
         if id_tipo_denuncia:
             denuncias = denuncias.filter(id_tipo_denuncia=id_tipo_denuncia)
         if id_estado :
