@@ -1,12 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.shortcuts import render
+
+from usuarios.models import Denunciante
 from .forms import DenunciaForm
 from .models import ProgramaAcademico, LugarReferencia, Denuncia, Insumo, TipoDenuncia, EstadoDenuncia
 from django.http import JsonResponse
 from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView
-
+from django.core.paginator import Paginator
 #------------------ Vista de detalle de denuncia ------------------#
 def detalle_denuncia(request, id_denuncia):
     # Obtener la denuncia por su ID o devolver un error 404 si no existe
@@ -38,7 +40,7 @@ def agregar_insumo(request, id_denuncia):
 
 
 @login_required
-def crear_denuncia(request: HttpRequest):
+def crear_denuncia (request: HttpRequest):
     denuncia_form = DenunciaForm()
     if request.method == 'POST':
         denuncia_form = DenunciaForm(request.POST)
@@ -73,9 +75,87 @@ def lugar_referencia(request, id_programa, id_tipolugar):
 class DenunciasListView(ListView):
     model=Denuncia
     template_name = 'muro_denuncias.html'
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):
         context =  super().get_context_data(**kwargs)
         context['tipo_denuncia'] = TipoDenuncia.objects.all()
         context['estado_denuncia'] = EstadoDenuncia.objects.all()
+        context['cant_pendientes'] = Denuncia.objects.filter(id_estado = 1).count()
+        context['cant_revision'] = Denuncia.objects.filter(id_estado = 2).count()
+        context['cant_resueltas'] = Denuncia.objects.filter(id_estado = 3).count()
+
+
         return context
+
+@login_required
+def muro_denuncias(request: HttpRequest):
+    denuncias = Denuncia.objects.all()
+    tipo = TipoDenuncia.objects.all()
+    estado = EstadoDenuncia.objects.all()
+    total = denuncias.count()
+    if request.method == 'POST':
+        id_tipo_denuncia = request.POST.get('tipo_denuncia')
+        id_estado = request.POST.get('estado')
+        fechai = request.POST.get('fechai')
+        fechaf = request.POST.get('fechaf')
+        if id_tipo_denuncia:
+            denuncias = denuncias.filter(id_tipo_denuncia=id_tipo_denuncia)
+        if id_estado :
+            denuncias = denuncias.filter(id_estado = id_estado)
+        if fechai and fechaf:
+            denuncias = denuncias.filter(fecha__range=(fechai, fechaf))
+        elif fechai:
+            denuncias = denuncias.filter(fecha__gte=fechai)   # Desde fecha inicial
+        elif fechaf:
+            denuncias = denuncias.filter(fecha__lte=fechaf)   # Hasta fecha final
+    else:
+        denuncias.order_by('-fecha')
+    paginator = Paginator(denuncias, 5)  
+    page_number = request.GET.get('page') 
+    denuncias_paginadas = paginator.get_page(page_number) 
+    cant_pendientes = Denuncia.objects.filter(id_estado = 1).count()
+    cant_revision = Denuncia.objects.filter(id_estado = 2).count()
+    cant_resueltas = Denuncia.objects.filter(id_estado = 3).count()
+    context = {'total':total,'denuncias':denuncias, 'tipo_denuncia':tipo, 'denuncias_paginadas':denuncias_paginadas,'estado_denuncia':estado,'cant_pendientes':cant_pendientes, 'cant_revision':cant_revision, 'cant_resueltas':cant_resueltas, 'filtros':request.POST}
+
+
+    return render(request, 'muro_denuncias.html', context)
+
+@login_required
+def perfil(request:HttpRequest ): 
+
+    id_denunciante =  Denunciante.objects.get(usuario=request.user).id_denunciante 
+    denuncias = Denuncia.objects.filter(id_denunciante=id_denunciante)
+    tipos = TipoDenuncia.objects.all()
+    estados = EstadoDenuncia.objects.all()
+
+    total = denuncias.count()
+    cant_pendientes = denuncias.filter(id_estado = 1).count()
+    cant_revision = denuncias.filter(id_estado = 2).count()
+    cant_resueltas = denuncias.filter(id_estado = 3).count()
+    cant_canceladas = denuncias.filter(id_estado = 4).count()
+
+    if request.method == 'POST':
+        id_tipo_denuncia = request.POST.get('tipo_denuncia')
+        id_estado = request.POST.get('estado_denuncia')
+
+        if id_tipo_denuncia:
+            denuncias = denuncias.filter(id_tipo_denuncia=id_tipo_denuncia)
+        if id_estado :
+            denuncias = denuncias.filter(id_estado = id_estado)
+    else:
+        denuncias.order_by('-fecha')
+    context = {
+        'denuncias':denuncias,
+        'tipos': tipos,
+        'estados' : estados,
+        'total':total,
+        'cant_pendientes':cant_pendientes,
+        'cant_revision':cant_revision,
+        'cant_resueltas':cant_resueltas,
+        'cant_canceladas':cant_canceladas,
+        'filtros':request.POST
+
+    }
+    return render (request,'perfil.html', context)

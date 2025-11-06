@@ -12,54 +12,70 @@
 <!-- Contenido de la página -->
 {% block contenido %}
 
-        <!-- Barra de navegación -->
-        {% include "nav_bar.html" %}
+<!-- Barra de navegación -->
+{% include "nav_bar.html" %}
         
-<!-- Contenedor principal -->
-<div class="container-fluid text-center px-0">
-    <div class="row mx-0">
-        <div class="row text-start px-4">
-            <h4 class="text-primary">Sistema de Reportes de Incidentes</h4>
-            <p class="text-muted">Campus UAZ Siglo XXI – Consulta y filtra las denuncias registradas.</p>
-        </div>
-
-        <!-- Tarjetas de resumen -->
-        <div class="col-6 col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <div class="fs-3 text-warning">⚠</div>
-                    <h3 class="fw-bold mb-0">4</h3>
-                    <p class="text-muted mb-0">Pendientes</p>
+<div class="row g-3 mb-4 mt-4">
+    <!-- Total -->
+    <div class="col-6 col-md">
+        <div class="card border-0 shadow-sm p-3 h-100">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-file-earmark-text fs-2 text-secondary"></i>
+                <div>
+                    <p class="text-muted mb-1">Total</p>
+                    <h5 class="fw-bold mb-0">{{ total }}</h5>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-6 col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <div class="fs-3 text-primary">⏱</div>
-                    <h3 class="fw-bold mb-0">4</h3>
-                    <p class="text-muted mb-0">En revisión</p>
+    <!-- Pendientes -->
+    <div class="col-6 col-md">
+        <div class="card border-0 shadow-sm p-3 h-100">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-exclamation-triangle fs-2 text-warning"></i>
+                <div>
+                    <p class="text-muted mb-1">Pendientes</p>
+                    <h5 class="fw-bold mb-0 text-warning">{{ cant_pendientes }}</h5>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-6 col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <div class="fs-3 text-success">✅</div>
-                    <h3 class="fw-bold mb-0">5</h3>
-                    <p class="text-muted mb-0">Resueltas</p>
+    <!-- En revisión -->
+    <div class="col-6 col-md">
+        <div class="card border-0 shadow-sm p-3 h-100">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-clock-history fs-2 text-warning"></i>
+                <div>
+                    <p class="text-muted mb-1">En Revisión</p>
+                    <h5 class="fw-bold mb-0 text-warning">{{ cant_revision  }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resueltas -->
+    <div class="col-6 col-md">
+        <div class="card border-0 shadow-sm p-3 h-100">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-check-circle fs-2 text-primary"></i>
+                <div>
+                    <p class="text-muted mb-1">Resueltas</p>
+                    <h5 class="fw-bold mb-0 text-primary">{{ cant_resueltas }}</h5>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+
 <!-- Fila principal -->
 <div class="row mx-0">
     <!-- Sidebar -->
     <div class="col-12 col-md-3 col-xl-3 border-end bg-white">
+        <form id="denunciaFiltros" method="post">
+        {% csrf_token %}
         <div class="px-3 pt-3 pb-4">
             <h6 class="text-primary mb-3">
                 <i class="bi bi-funnel me-2"></i>Filtros de Búsqueda
@@ -70,7 +86,8 @@
                 <select id="tipo_denuncia" name="tipo_denuncia" class="form-select">
                     <option value="">Seleccione un tipo</option>
                     {% for tipo in tipo_denuncia %}
-                        <option value="{{ tipo.id_tipo_denuncia }}">{{ tipo.descripcion }}</option>
+                        <option value="{{ tipo.id_tipo_denuncia }}">
+                         {{ tipo.descripcion }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -81,19 +98,34 @@
                     <option value="">Selecciona el estado</option>
                     
                     {% for estado in estado_denuncia %}
-                        <option value="{{ estado.id_estado }}"> {{estado.estado }} </option>
+                        <option value="{{ estado.id_estado }}"
+                            {% if filtros.estado == estado.id_estado|stringformat:"s" %} selected {% endif %}>
+                            {{ estado.estado }}
+                        </option>
                     {% endfor %}
                 </select>
-                        
             </div>
 
+           
+
             <div class="mb-3">
-                <label class="form-label fw-semibold">Rango de fechas</label>
-                <input type="date" class="form-control mb-2">
-                <input type="date" class="form-control mb-2">
-                <button class="btn btn-outline-secondary w-100" onclick="limpiarFiltro()">Limpiar filtros</button>
+                <label class="form-label fw-semibold d-block mb-2">Rango de fechas</label>
+
+                <label class="form-label text-muted d-block">Desde</label>
+                <input type="date" class="form-control mb-2" id="fechai" name="fechai" value="{{ filtros.fechai }}">
+
+
+                <label class="form-label text-muted d-block">Hasta</label>
+                <input type="date" class="form-control mb-2" id="fechaf" name="fechaf" value="{{ filtros.fechaf }}">
+
+                <div class="d-flex gap-2 mt-2">
+                    <button type="submit" class="btn btn-primary">Aplicar filtros</button>
+                    <button type="button" onclick="limpiarFiltro()" class="btn btn-secondary">Limpiar filtros</button>
+                </div>
+
             </div>
         </div>
+        </form>
     </div>
 
     <!-- Contenido principal -->
@@ -104,18 +136,20 @@
                 Denuncias recientes
             </div>
 
-            <div class="card-body" style="max-height: 420px; overflow-y: auto;">
-                {% for denuncia in object_list %}
+            <div class="card-body" id="lista-denuncias"style="max-height: 420px; overflow-y: auto;">
+                {% for denuncia in denuncias_paginadas %}
                 <a href="{% url 'detalle_denuncia' denuncia.id_denuncia %}" 
                    class="text-decoration-none text-dark">
                     <div class="mb-3 p-3 border rounded bg-white hover-shadow-sm denuncia-card">
                         <h6 class="fw-semibold">
                             {{ denuncia.título }}
                             <span class="badge 
-                                {% if denuncia.id_tipo_denuncia.descripcion == 'Infraestructura' %}
+                                {% if denuncia.id_tipo_denuncia.descripcion == 'INFRAESTRUCTURA' %}
                                     bg-warning text-dark
-                                {% elif denuncia.id_tipo_denuncia.descripcion == 'Mantenimiento' %}
+                                {% elif denuncia.id_tipo_denuncia.descripcion == 'MOBILIARIO' %}
                                     bg-info text-dark
+                                {% elif denuncia.id_tipo_denuncia.descripcion == 'SERVICIOS' %}
+                                    bg-info text-dark    
                                 {% else %}
                                     bg-secondary
                                 {% endif %}
@@ -140,34 +174,45 @@
 
             <!-- Paginación -->
             <div class="card-footer bg-white">
-                <nav aria-label="Paginación de denuncias">
+                <nav aria-label="Paginación">
                     <ul class="pagination justify-content-center mb-0">
-                        <li class="page-item disabled">
-                            <a class="page-link">Anterior</a>
-                        </li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Siguiente</a>
-                        </li>
+                        {% if denuncias_paginadas.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ denuncias_paginadas.previous_page_number }}">Anterior</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><a class="page-link">Anterior</a></li>
+                        {% endif %}
+
+                        {% for num in denuncias_paginadas.paginator.page_range %}
+                            {% if denuncias_paginadas.number == num %}
+                                <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if denuncias_paginadas.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ denuncias_paginadas.next_page_number }}">Siguiente</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><a class="page-link">Siguiente</a></li>
+                        {% endif %}
                     </ul>
                 </nav>
             </div>
         </div>
     </div>
-</div>
 {% endblock contenido %}
 
 {% block scripts %}
     <script>
         function limpiarFiltro(){
-            const select_tipo = document.getElementById('tipo_denuncia');
-            select_tipo.value = ""; // esto solo me ayuda a vaciar la seleccion
-            const select_estado = document.getElementById('estado');
-            select_estado.value = "";
+            document.getElementById('tipo_denuncia').value = "";  // esto solo me ayuda a vaciar la seleccion
+            document.getElementById('estado').value = "";
+            document.getElementById('fechai').value = "";
+            document.getElementById('fechaf').value = "";
         }
     </script>
-    
-
 {% endblock scripts %}

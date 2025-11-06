@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %}
+    Perfil
+{% endblock titulo %}
+    
+
+{% block contenido %}
+{% include 'nav_bar.html' %}
+
+<div class="bg-light min-vh-100 d-flex flex-column">
+  <div class="container-xl py-4">
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="fw-bold d-flex align-items-center gap-2" style="font-size: 24px;">
+          <i class="bi bi-person-circle fs-3 text-success"></i> Panel del Denunciante
+        </h1>
+        <p class="text-muted" style="font-size: 16px;">Bienvenido, {{ request.user.nombre }}</p>
+      </div>
+      <button class="btn btn-warning text-white px-4 py-2">
+        <i class="bi bi-plus-lg me-2"></i>Nueva Denuncia
+      </button>
+    </div>
+
+    <div class="row g-3 mb-4 mt-4">
+    <!-- Total -->
+    <div class="col-6 col-md">
+        <div class="card border-0 shadow-sm p-3 h-100">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-file-earmark-text fs-2 text-secondary"></i>
+                <div>
+                    <p class="text-muted mb-1">Total</p>
+                    <h5 class="fw-bold mb-0">{{ total }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pendientes -->
+    <div class="col-6 col-md">
+        <div class="card border-0 shadow-sm p-3 h-100">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-exclamation-triangle fs-2 text-warning"></i>
+                <div>
+                    <p class="text-muted mb-1">Pendientes</p>
+                    <h5 class="fw-bold mb-0 text-warning">{{ cant_pendientes }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- En revisión -->
+    <div class="col-6 col-md">
+        <div class="card border-0 shadow-sm p-3 h-100">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-clock-history fs-2 text-warning"></i>
+                <div>
+                    <p class="text-muted mb-1">En Revisión</p>
+                    <h5 class="fw-bold mb-0 text-warning">{{ cant_revision  }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resueltas -->
+    <div class="col-6 col-md">
+        <div class="card border-0 shadow-sm p-3 h-100">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-check-circle fs-2 text-primary"></i>
+                <div>
+                    <p class="text-muted mb-1">Resueltas</p>
+                    <h5 class="fw-bold mb-0 text-primary">{{ cant_resueltas }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md">
+        <div class="card border-0 shadow-sm p-3 h-100">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-x-circle fs-2 text-danger"></i>
+                <div>
+                    <p class="text-muted mb-1">Canceladas</p>
+                    <h5 class="fw-bold mb-0 text-danger">{{ cant_canceladas }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Tabla / Mis denuncias -->
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <h5 class="fw-bold m-0 d-flex align-items-center gap-2">
+          <i class="bi bi-file-earmark-text text-success"></i> Mis Denuncias
+        </h5>
+
+        <!-- Filtros -->
+        <form id="filtrosForm" method="post">
+        {% csrf_token %}
+        <div class="d-flex gap-2">
+          <select class="form-select form-select-sm" id="tipo_denuncia" name="tipo_denuncia">
+                {% for tipo in tipos %}
+                    <option value="{{ tipo.id_tipo_denuncia }}"
+                    {% if request.POST.tipo_denuncia == tipo.id_tipo_denuncia|stringformat:"s" %}
+                        selected
+                    {% endif %}>
+                    {{ tipo.descripcion }}
+                    </option>
+                {% endfor %}
+          </select>
+
+          <select class="form-select form-select-sm" id="estado_denuncia" name="estado_denuncia">
+            <option value="">Selecciona estado</option>
+            
+            {% for estado  in estados %}
+                <option value="{{estado.id_estado}}" {% if request.POST.estado_denuncia == estado.id_estado|stringformat:"s" %}
+                        selected{% endif %}> 
+                        {{estado.estado}} 
+                </option>
+            {% endfor %}
+          </select>
+        </div>
+        </form>
+      </div>
+       <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Denunciante</th>
+                                    <th>Tipo</th>
+                                    <th>Descripción</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <!-- Lista de denuncias -->
+                            <tbody>
+                                {% for denuncia in denuncias %}
+                                <tr>
+                                    <td>{{ denuncia.título }}</td>
+                                    <td>{{ denuncia.id_denunciante.usuario.nombre }}</td>
+                                    <td>{{ denuncia.id_tipo_denuncia.descripcion }}</td>
+                                    <td>{{ denuncia.descripcion }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if denuncia.id_estado.estado == 'PENDIENTE' %}
+                                                bg-warning text-dark 
+                                            {% elif denuncia.id_estado.estado == 'EN_PROCESO' %}
+                                                bg-info text-dark
+                                            {% elif denuncia.id_estado.estado == 'RESUELTA' %}
+                                                bg-success
+                                            {% elif denuncia.id_estado.estado == 'CANCELADA' %}
+                                                bg-danger
+                                            {% else %}
+                                                bg-secondary
+                                            {% endif %}">
+                                            {{ denuncia.id_estado.estado }}
+                                        </span>
+                                    </td>
+                                    <td>{{ denuncia.fecha|date:"d/m/Y" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-muted text-center">No hay denuncias registradas</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+  </div>
+</div>
+
+{% endblock contenido %}
+
+
+{% block scripts %}
+    <script>
+        document.getElementById('tipo_denuncia').addEventListener('change', 
+        function(){
+            document.getElementById('filtrosForm').submit();
+        }) 
+        
+        document.getElementById('estado_denuncia').addEventListener('change', 
+        function(){
+            document.getElementById('filtrosForm').submit();
+        })
+    </script>
+    
+{% endblock scripts %}
+    
