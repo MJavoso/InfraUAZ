@@ -11,5 +11,6 @@ urlpatterns = [
     path('crear-cuenta/correo/<slug:uidb64>', views.reenviar_correo_activacion, name='reenviar_correo'),
     path('registro-admin/', views.registro_admin, name='registro_admin'),
     path('editar-admin', views.editar_admin),
+    path('usuarios/admin/detalle/<int:id_admin>', views.detalle_admin, name='detalle_admin'),
     path('actualizar-info-admin', views.actualizar_info_admin, name='actualizar_info_admin'),
 ]
