@@ -73,7 +73,7 @@
 <!-- Fila principal -->
 <div class="row mx-0">
     <!-- Sidebar -->
-    <div class="col-12 col-md-3 col-xl-3 border-end bg-white">
+    <div class="col-12 col-md-3 col-xl-3 bg-white border rounded-3 shadow-sm">
         <form id="denunciaFiltros" method="post">
         {% csrf_token %}
         <div class="px-3 pt-3 pb-4">
@@ -124,6 +124,36 @@
                 </div>
 
             </div>
+
+            <hr class="my-2">
+            <div class="mb-3">
+                <label class="form-label fw-semibold d-block mb-2">Leyenda de estados</label>
+
+                <div class="d-flex flex-column gap-2">
+
+                    <!-- Pendiente -->
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="rounded-circle d-inline-block" 
+                            style="width: 12px; height: 12px; background-color: #ffc107;"></span>
+                        <span class="text-muted">Pendiente</span>
+                    </div>
+
+                    <!-- En Revisión -->
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="rounded-circle d-inline-block" 
+                            style="width: 12px; height: 12px; background-color: #ffc107;"></span>
+                        <span class="text-muted">En revisión</span>
+                    </div>
+
+                    <!-- Resuelta -->
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="rounded-circle d-inline-block" 
+                            style="width: 12px; height: 12px; background-color: #0d6efd;"></span>
+                        <span class="text-muted">Resuelta</span>
+                    </div>
+
+                </div>
+            </div>
         </div>
         </form>
     </div>
@@ -140,10 +170,25 @@
                 {% for denuncia in denuncias_paginadas %}
                 <a href="{% url 'detalle_denuncia' denuncia.id_denuncia %}" 
                    class="text-decoration-none text-dark">
+                    
+                </a>
+                {% empty %}
+                <p class="text-muted">No hay denuncias registradas.</p>
+                {% endfor %}
+            </div>
+            <div class="card-body" id="lista-denuncias" style="max-height: 420px; overflow-y: auto;">
+                {% for denuncia in denuncias_paginadas %}
+                <a href="{% url 'detalle_denuncia' denuncia.id_denuncia %}" class="text-decoration-none text-dark">
                     <div class="mb-3 p-3 border rounded bg-white hover-shadow-sm denuncia-card">
-                        <h6 class="fw-semibold">
-                            {{ denuncia.título }}
-                            <span class="badge 
+
+                        <!-- Título con badge a la derecha -->
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h6 class="fw-semibold mb-0">
+                                {{ denuncia.título }}
+                            </h6>
+
+                            <!-- Badge según estado -->
+                             <span class="badge 
                                 {% if denuncia.id_tipo_denuncia.descripcion == 'INFRAESTRUCTURA' %}
                                     bg-warning text-dark
                                 {% elif denuncia.id_tipo_denuncia.descripcion == 'MOBILIARIO' %}
@@ -156,15 +201,39 @@
                                 ms-2">
                                 {{ denuncia.id_tipo_denuncia.descripcion }}
                             </span>
-                        </h6>
-                        <p class="mb-1 text-muted">
+                        </div>
+
+                        <!-- Descripción -->
+                        <p class="mt-2 mb-2 text-muted">
                             {{ denuncia.descripcion|truncatechars:120 }}
                         </p>
-                        <small class="text-muted">
-                            📍 {{ denuncia.id_lugar.id_programa.id_edificio.nombre }} – {{ denuncia.id_lugar.nombre_lugar }}
-                            | ⚠ {{ denuncia.id_estado.estado }}
-                            | 📅 {{ denuncia.fecha|date:"d/m/Y" }}
+
+                        <!-- Línea divisoria -->
+                        <hr class="my-2">
+
+                        <!-- Información inferior -->
+                        <small  class="text-muted d-flex justify-content-between align-items-center">
+                             <!-- IZQUIERDA -->
+                            <span>
+                                📍 {{ denuncia.id_lugar.id_programa.id_edificio.nombre }} – {{ denuncia.id_lugar.nombre_lugar }}
+                            </span>
+
+                            <!-- DERECHA -->
+                            <span>
+                                {% if denuncia.id_estado.estado == 'PENDIENTE' %}
+                                    <span class="text-warning"><i class="bi bi-exclamation-triangle"></i> Pendiente</span>
+                                {% elif denuncia.id_estado.estado == 'EN_PROCESO' %}
+                                    <span class="text-warning"><i class="bi bi-clock-history"></i> En revisión</span>
+                                {% elif denuncia.id_estado.estado == 'RESUELTA' %}
+                                    <span class="text-primary"><i class="bi bi-check-circle"></i> Resuelta</span>
+                                {% else %}
+                                    <span class="text-muted">{{ denuncia.id_estado.estado }}</span>
+                                {% endif %}
+                                
+                                | 📅 {{ denuncia.fecha|date:"d/m/Y" }}
+                            </span>
                         </small>
+
                     </div>
                 </a>
                 {% empty %}
