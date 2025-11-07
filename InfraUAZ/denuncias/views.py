@@ -161,4 +161,4 @@ def perfil(request:HttpRequest ):
     return render (request,'perfil.html', context)
 def modal_denuncia(request):
     #Despues se procesaran datos aqui
-    return render(request, 'reportes/modal_denuncia.html')
+    return render(request, 'modal_denuncia.html')
