@@ -42,11 +42,16 @@
         </div>
 
         <!-- Botón de reportar (Aqui se debe de redireccionar a la parte que le toca a Idaly)-->
+        <!-- Botón de reportar (Modal de denuncia) -->
         <div>
-            <a href="{% url 'crear_denuncia' %}" class="btn btn-outline-danger">
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalDenuncia">
                 <i class="bi bi-flag-fill me-1"></i> Reportar Denuncia
-            </a>
+            </button>
         </div>
+
+        <!-- Incluimos el modal justo después del botón -->
+        {% include 'componentes/modal_denuncia.html' %}
+
     </div>
 
     <hr class="my-4">
