@@ -7,32 +7,51 @@ from reportlab.lib.styles import getSampleStyleSheet
 # Importaciones para poner la fecha en el título PDF
 from datetime import datetime
 from io import BytesIO
-# Importar el modelo Denuncia y render
+# Importar el modelo Denuncia, render y el administrador
+from usuarios.models import Administrador
 from denuncias.models import Denuncia, EstadoDenuncia, TipoDenuncia
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 # ListView para la bandeja de entrada
 from django.views.generic import ListView
 from django.urls import reverse_lazy
+# Importación para asegurarse que el usuario se loguee
+from django.contrib.auth.decorators import login_required
+# Importación que asegura que solo los administradores accedan
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Vista para la bandeja de entrada del administrador
-class DenunciasAdminListView(ListView):
-    # Obtener todas las denuncias
-    model=Denuncia
-    # Nombre de la plantilla
+class BandejaEntradaAdminListView(LoginRequiredMixin, ListView):
+    model = Denuncia
     template_name = 'administrador/bandeja_entrada_admin.html'
+    context_object_name = 'denuncias'
+    paginate_by = 10  # si quieres paginación
 
-    # Contexto adicional para la plantilla
-    def get_context_data(self, **kwargs): # **kwargs permite pasar un número variable de argumentos clave-valor
-        context =  super().get_context_data(**kwargs)
+    def get_queryset(self):
+        """Filtra denuncias por el edificio asignado al administrador"""
+        usuario = self.request.user
+        if hasattr(usuario, 'administrador'):
+            admin = usuario.administrador
+            Denuncia.objects.filter(id_lugar__id_programa__id_edificio=admin.programa_academico.id_edificio)
+            # Filtramos por el edificio del programa académico del admin
+            return Denuncia.objects.filter(
+                id_lugar__id_programa__id_edificio=admin.programa_academico.id_edificio
+            ).select_related('id_estado', 'id_tipo_denuncia', 'id_lugar')
+        return Denuncia.objects.none()
+
+    def get_context_data(self, **kwargs):
+        """Agrega los contadores y filtros al contexto"""
+        context = super().get_context_data(**kwargs)
+        # Agregar tipos de denuncia y estados al contexto para los filtros
         context['tipo_denuncia'] = TipoDenuncia.objects.all()
         context['estado_denuncia'] = EstadoDenuncia.objects.all()
+        # Contadores de denuncias por estado
+        context['cant_pendientes'] = Denuncia.objects.filter(id_estado__estado="Pendiente").count()
+        context['cant_revision'] = Denuncia.objects.filter(id_estado__estado="En revisión").count()
+        context['cant_resueltas'] = Denuncia.objects.filter(id_estado__estado="Resuelta").count()
+        context['cant_canceladas'] = Denuncia.objects.filter(id_estado__estado="Cancelada").count()
         return context
-# Asignar la vista a una variable para usar en urls.py
-
-bandeja_entrada_administrador = DenunciasAdminListView.as_view()
-
+    
 # Vista para el panel de administrador
-@staff_member_required
 def panel_administrador(request):
     # Obtener denuncias pendientes por defecto
     denuncias = Denuncia.objects.filter(id_estado__estado='Pendiente')
@@ -58,7 +77,7 @@ def panel_administrador(request):
 
 
 # Vista para generar el PDF del botón 'reporte de denuncias'
-@staff_member_required
+#@staff_member_required
 def generar_reporte_denuncias_pdf(request):
     # Crear la respuesta HTTP con tipo PDF
     fecha_actual = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -130,8 +149,39 @@ def generar_reporte_denuncias_pdf(request):
     return response
 
 # Vista para el perfil del administrador
-def perfil_admin(request):
-    """
-    Muestra la información del perfil del administrador.
-    """
-    return render(request, 'administrador/perfil_admin.html')
+def perfil_administrador(request):
+    # Obtener el administrador logueado
+    admin = Administrador.objects.filter(usuario=request.user).first()
+
+    if not admin:
+        return render(request, 'administrador/perfil_admin.html', {
+            'error': 'No tienes asignado un programa académico o no eres administrador registrado.'
+        })
+
+    # Edificio del programa académico del administrador
+    edificio = admin.programa_academico.id_edificio
+
+    # Denuncias del edificio asignado
+    denuncias = Denuncia.objects.filter(
+        id_lugar__id_programa__id_edificio=edificio
+    ).order_by('-fecha')
+
+    # Contadores
+    total = denuncias.count()
+    pendientes = denuncias.filter(id_estado__estado='Pendiente').count()
+    en_revision = denuncias.filter(id_estado__estado='En revisión').count()
+    resueltas = denuncias.filter(id_estado__estado='Resuelta').count()
+    canceladas = denuncias.filter(id_estado__estado='Cancelada').count()
+
+    contexto = {
+        'admin': admin,
+        'denuncias': denuncias,
+        'total': total,
+        'pendientes': pendientes,
+        'en_revision': en_revision,
+        'resueltas': resueltas,
+        'canceladas': canceladas,
+        'edificio': edificio,  # lo mandamos al template para mostrarlo
+    }
+
+    return render(request, 'administrador/perfil_admin.html', contexto)
