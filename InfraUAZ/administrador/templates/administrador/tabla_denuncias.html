@@ -1,0 +1,43 @@
+<table class="table table-hover align-middle">
+  <thead class="table-light">
+    <tr>
+      <th>Título</th>
+      <th>Denunciante</th>
+      <th>Tipo</th>
+      <th>Descripción</th>
+      <th>Estado</th>
+      <th>Fecha</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for denuncia in denuncias %}
+    <tr onclick="window.location.href='{% url 'detalle_denuncia' denuncia.id_denuncia %}'" style="cursor:pointer;">
+      <td>{{ denuncia.título }}</td>
+      <td>{{ denuncia.id_denunciante.usuario.nombre }}</td>
+      <td>{{ denuncia.id_tipo_denuncia.descripcion }}</td>
+      <td>{{ denuncia.descripcion|truncatechars:60 }}</td>
+      <td>
+        <span class="badge 
+          {% if denuncia.id_estado.estado == 'Pendiente' %}
+            bg-warning text-dark
+          {% elif denuncia.id_estado.estado == 'En revisión' %}
+            bg-info text-dark
+          {% elif denuncia.id_estado.estado == 'Resuelta' %}
+            bg-success
+          {% elif denuncia.id_estado.estado == 'Cancelada' %}
+            bg-danger
+          {% else %}
+            bg-secondary
+          {% endif %}">
+          {{ denuncia.id_estado.estado }}
+        </span>
+      </td>
+      <td>{{ denuncia.fecha|date:"d/m/Y" }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="6" class="text-muted text-center">No hay denuncias registradas</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

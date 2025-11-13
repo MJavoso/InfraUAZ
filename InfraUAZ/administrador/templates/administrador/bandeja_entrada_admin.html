@@ -4,73 +4,92 @@
 {% block titulo %}Bandeja de Entrada - Administrador{% endblock titulo %}
 
 {% block contenido %}
-{% include "administrador/nav_bar_admin.html" %}
+{% include "nav_bar.html" %}
 
-<div class="container-fluid text-center px-0">
-    <div class="row mx-0">
-        <div class="row text-start px-4 mt-3">
-            <h4 class="text-primary">Sistema de Reportes de Incidentes</h4>
-            <p class="text-muted">Campus UAZ Siglo XXI – Consulta y filtra las denuncias registradas en tu edificio.</p>
-        </div>
-
-        <!-- Tarjeta resumen -->
-        <div class="col-6 col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <div class="fs-3 text-warning">⚠</div>
-                    <h3 class="fw-bold mb-0">{{ denuncias|length }}</h3>
-                    <p class="text-muted mb-0">Total denuncias</p>
-                </div>
-            </div>
-        </div>
+<div class="container-fluid px-4 py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="text-primary">Sistema de Reportes de Incidentes</h4>
+      <p class="text-muted">Campus UAZ Siglo XXI – Consulta y filtra las denuncias registradas en tu edificio.</p>
     </div>
-</div>
+  </div>
+
+  <!-- Tarjetas resumen -->
+  <div class="row g-3 mb-4 text-center">
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm p-3">
+        <h5 class="fw-bold mb-0">{{ total_denuncias }}</h5>
+        <p class="text-muted mb-0">Total</p>
+        <div class="fs-3 text-secondary"><i class="bi bi-file-earmark-text"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm p-3">
+        <h5 class="fw-bold mb-0 text-warning">{{ cant_pendientes }}</h5>
+        <p class="text-muted mb-0">Pendientes</p>
+        <div class="fs-3 text-warning"><i class="bi bi-exclamation-triangle"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm p-3">
+        <h5 class="fw-bold mb-0 text-info">{{ cant_revision }}</h5>
+        <p class="text-muted mb-0">En Revisión</p>
+        <div class="fs-3 text-info"><i class="bi bi-clock-history"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm p-3">
+        <h5 class="fw-bold mb-0 text-success">{{ cant_resueltas }}</h5>
+        <p class="text-muted mb-0">Resueltas</p>
+        <div class="fs-3 text-success"><i class="bi bi-check-circle"></i></div>
+      </div>
+    </div>
+  </div>
 
 <!-- Fila principal -->
 <div class="row mx-0">
     <!-- Sidebar de filtros -->
     <div class="col-12 col-md-3 col-xl-3 border-end bg-white">
-        <div class="px-3 pt-3 pb-4">
-            <h6 class="text-primary mb-3">
-                <i class="bi bi-funnel me-2"></i>Filtros de búsqueda
-            </h6>
+        <form method="get" id="filtrosForm">
+            <div class="mb-3">
+                <label class="form-label fw-semibold" for="tipo_denuncia">Tipo de denuncia</label>
+                <select id="tipo_denuncia" name="tipo_denuncia" class="form-select">
+                    <option value="">Seleccione un tipo</option>
+                    {% for tipo in tipo_denuncia %}
+                        <option value="{{ tipo.id_tipo_denuncia }}"
+                            {% if filtros.tipo_denuncia == tipo.id_tipo_denuncia|stringformat:"s" %}selected{% endif %}>
+                            {{ tipo.descripcion }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-            <form method="get" id="filtrosForm">
-                <div class="mb-3">
-                    <label class="form-label fw-semibold" for="tipo_denuncia">Tipo de denuncia</label>
-                    <select id="tipo_denuncia" name="tipo_denuncia" class="form-select">
-                        <!-- Opciones de tipo de denuncia -->
-                        <option value="">Seleccione un tipo</option>
-                        {% for tipo in tipo_denuncia %}
-                            <option value="{{ tipo.id_tipo_denuncia }}">{{ tipo.descripcion }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold" for="estado">Estado</label>
+                <select id="estado" name="estado" class="form-select">
+                    <option value="">Selecciona el estado</option>
+                    {% for estado in estado_denuncia %}
+                        <option value="{{ estado.id_estado }}"
+                            {% if filtros.estado == estado.id_estado|stringformat:"s" %}selected{% endif %}>
+                            {{ estado.estado }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold" for="estado">Estado</label>
-                    <select id="estado" name="estado" class="form-select">
-                        <option value="">Selecciona el estado</option>
-                        {% for estado in estado_denuncia %}
-                            <option value="{{ estado.id_estado }}">{{ estado.estado }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Rango de fechas</label>
+                <input type="date" class="form-control mb-2" name="fecha_inicio" value="{{ filtros.fecha_inicio }}">
+                <input type="date" class="form-control mb-2" name="fecha_fin" value="{{ filtros.fecha_fin }}">
+            </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Rango de fechas</label>
-                    <input type="date" class="form-control mb-2" name="fecha_inicio">
-                    <input type="date" class="form-control mb-2" name="fecha_fin">
-                </div>
-
-                <button type="submit" class="btn btn-primary w-100 mb-2">
-                    <i class="bi bi-search"></i> Aplicar filtros
-                </button>
-                <button type="button" class="btn btn-outline-secondary w-100" onclick="limpiarFiltro()">
-                    Limpiar filtros
-                </button>
-            </form>
-        </div>
+            <button type="submit" class="btn btn-primary w-100 mb-2">
+            <i class="bi bi-search"></i> Aplicar filtros
+            </button>
+            <button type="button" class="btn btn-outline-secondary w-100" id="limpiarFiltros">
+                Limpiar filtros
+            </button>
+        </form>
     </div>
 
     <!-- Listado principal -->
@@ -116,31 +135,35 @@
             </div>
 
             <!-- Paginación -->
-            {% if is_paginated %}
             <div class="card-footer bg-white">
-                <nav aria-label="Paginación de denuncias">
+                <nav aria-label="Paginación">
                     <ul class="pagination justify-content-center mb-0">
-                        {% if page_obj.has_previous %}
-                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a></li>
+                        {% if denuncias_paginadas.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ denuncias_paginadas.previous_page_number }}">Anterior</a>
+                            </li>
                         {% else %}
-                            <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+                            <li class="page-item disabled"><a class="page-link">Anterior</a></li>
                         {% endif %}
 
-                        {% for i in paginator.page_range %}
-                            <li class="page-item {% if page_obj.number == i %}active{% endif %}">
-                                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-                            </li>
+                        {% for num in denuncias_paginadas.paginator.page_range %}
+                            {% if denuncias_paginadas.number == num %}
+                                <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
                         {% endfor %}
 
-                        {% if page_obj.has_next %}
-                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a></li>
+                        {% if denuncias_paginadas.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ denuncias_paginadas.next_page_number }}">Siguiente</a>
+                            </li>
                         {% else %}
-                            <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+                            <li class="page-item disabled"><a class="page-link">Siguiente</a></li>
                         {% endif %}
                     </ul>
                 </nav>
             </div>
-            {% endif %}
         </div>
     </div>
 </div>
@@ -148,11 +171,15 @@
 
 {% block scripts %}
 <script>
-function limpiarFiltro(){
-    document.getElementById('tipo_denuncia').value = "";
-    document.getElementById('estado').value = "";
-    document.getElementsByName('fecha_inicio')[0].value = "";
-    document.getElementsByName('fecha_fin')[0].value = "";
-}
+document.addEventListener("DOMContentLoaded", () => {
+    // Botón para limpiar filtros
+    const btnLimpiar = document.getElementById("limpiarFiltros");
+    if (btnLimpiar) {
+        btnLimpiar.addEventListener("click", () => {
+            // Redirige al mismo path sin parámetros GET
+            window.location.href = window.location.pathname;
+        });
+    }
+});
 </script>
 {% endblock scripts %}

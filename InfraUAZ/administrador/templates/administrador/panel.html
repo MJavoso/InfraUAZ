@@ -5,7 +5,7 @@
 
 {% block contenido %}
 
-{% include "administrador/nav_bar_admin.html" %}
+{% include "nav_bar.html" %}
 
 <!-- Estilos -->
 <link rel="stylesheet" href="{% static 'css/panel.css' %}">
@@ -15,7 +15,7 @@
     <!-- Encabezado -->
     <div class="row mb-4 d-flex justify-content-between align-items-center">
         <div class="col-auto">
-            <h2 class="text-primary fw-bold mb-0">Panel de Administrador</h2>
+            <h4 class="text-primary">Sistema de Reportes de Incidentes</h4>
             <h5 class="text-secondary">Gestión y seguimiento de denuncias del campus UAZ Siglo XXI</h5>
         </div>
         <div class="col-auto">
@@ -97,75 +97,34 @@
                 </div>
 
                 <div class="card-body">
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-4">
-                            <input type="text" class="form-control" placeholder="ID, tipo, ubicación...">
-                        </div>
-                        <div class="col-md-4">
-                            <select name="estado" class="form-select" onchange="this.form.submit()">
-                                <option {% if estado_filtro == 'Todos' %}selected{% endif %}>Todos</option>
-                                <option {% if estado_filtro == 'Pendiente' %}selected{% endif %}>Pendiente</option>
-                                <option {% if estado_filtro == 'En revisión' %}selected{% endif %}>En revisión</option>
-                                <option {% if estado_filtro == 'Resuelta' %}selected{% endif %}>Resuelta</option>
-                                <option {% if estado_filtro == 'Cancelada' %}selected{% endif %}>Cancelada</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <select class="form-select">
-                                <option selected>Tipo de incidente: Todos</option>
-                                <option>Infraestructura</option>
-                                <option>Mantenimiento</option>
-                            </select>
-                        </div>
+                 <!-- Filtros -->
+                  <form id="filtros-form" class="row g-3 mb-3">
+                    <div class="col-md-4">
+                      <input type="text" name="busqueda" id="busqueda" class="form-control" placeholder="ID, tipo, ubicación...">
                     </div>
+                    <div class="col-md-4">
+                      <select name="estado" id="estado" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="1">Pendiente</option>
+                        <option value="2">En revisión</option>
+                        <option value="3">Resuelta</option>
+                        <option value="4">Cancelada</option>
+                      </select>
+                    </div>
+                    <div class="col-md-4">
+                      <select name="tipo" id="tipo" class="form-select">
+                        <option value="">Tipo de incidente: Todos</option>
+                        {% for tipo in tipo_denuncia %}
+                          <option value="{{ tipo.id_tipo_denuncia }}">{{ tipo.descripcion }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </form>
 
-                    <!-- Tabla de denuncias -->
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Título</th>
-                                    <th>Denunciante</th>
-                                    <th>Tipo</th>
-                                    <th>Descripción</th>
-                                    <th>Estado</th>
-                                    <th>Fecha</th>
-                                </tr>
-                            </thead>
-                            <!-- Lista de denuncias -->
-                            <tbody>
-                                {% for denuncia in denuncias %}
-                                <tr>
-                                    <td>{{ denuncia.título }}</td>
-                                    <td>{{ denuncia.id_denunciante.usuario.nombre }}</td>
-                                    <td>{{ denuncia.id_tipo_denuncia.descripcion }}</td>
-                                    <td>{{ denuncia.descripcion|truncatechars:60 }}</td>
-                                    <td>
-                                        <span class="badge 
-                                            {% if denuncia.id_estado.estado == 'Pendiente' %}
-                                                bg-warning text-dark
-                                            {% elif denuncia.id_estado.estado == 'En revisión' %}
-                                                bg-info text-dark
-                                            {% elif denuncia.id_estado.estado == 'Resuelta' %}
-                                                bg-success
-                                            {% elif denuncia.id_estado.estado == 'Cancelada' %}
-                                                bg-danger
-                                            {% else %}
-                                                bg-secondary
-                                            {% endif %}">
-                                            {{ denuncia.id_estado.estado }}
-                                        </span>
-                                    </td>
-                                    <td>{{ denuncia.fecha|date:"d/m/Y" }}</td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="6" class="text-muted text-center">No hay denuncias registradas</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                  <!-- Tabla de denuncias -->
+                  <div class="table-responsive" id="tabla-denuncias">
+                    {% include 'administrador/tabla_denuncias.html' %}
+                  </div>
                 </div>
             </div>
         </div>
@@ -176,4 +135,25 @@
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const form = document.getElementById("filtros-form");
+  const tabla = document.getElementById("tabla-denuncias");
+
+  // Escucha cambios en cualquier campo del filtro
+  form.querySelectorAll("select, input").forEach(input => {
+    input.addEventListener("input", actualizarTabla);
+    input.addEventListener("change", actualizarTabla);
+  });
+
+  async function actualizarTabla() {
+    const params = new URLSearchParams(new FormData(form));
+    const response = await fetch("{% url 'filtrar_denuncias_panel' %}?" + params.toString());
+    const html = await response.text();
+    tabla.innerHTML = html;
+  }
+});
+</script>
 {% endblock scripts %}
+
