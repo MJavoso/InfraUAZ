@@ -122,6 +122,38 @@ def bandeja_entrada_admin(request: HttpRequest):
 
     return render(request, 'bandeja_entrada_admin.html', context)
 
+# Vista para la bandeja de entrada del administrador
+class BandejaEntradaAdminListView(LoginRequiredMixin, ListView):
+    model = Denuncia
+    template_name = 'administrador/bandeja_entrada_admin.html'
+    context_object_name = 'denuncias'
+    paginate_by = 10  # si quieres paginación
+
+    def get_queryset(self):
+        """Filtra denuncias por el edificio asignado al administrador"""
+        usuario = self.request.user
+        if hasattr(usuario, 'administrador'):
+            admin = usuario.administrador
+            Denuncia.objects.filter(id_lugar__id_programa__id_edificio=admin.programa_academico.id_edificio)
+            # Filtramos por el edificio del programa académico del admin
+            return Denuncia.objects.filter(
+                id_lugar__id_programa__id_edificio=admin.programa_academico.id_edificio
+            ).select_related('id_estado', 'id_tipo_denuncia', 'id_lugar')
+        return Denuncia.objects.none()
+
+    def get_context_data(self, **kwargs):
+        """Agrega los contadores y filtros al contexto"""
+        context = super().get_context_data(**kwargs)
+        # Agregar tipos de denuncia y estados al contexto para los filtros
+        context['tipo_denuncia'] = TipoDenuncia.objects.all()
+        context['estado_denuncia'] = EstadoDenuncia.objects.all()
+        # Contadores de denuncias por estado
+        context['cant_pendientes'] = Denuncia.objects.filter(id_estado__estado="Pendiente").count()
+        context['cant_revision'] = Denuncia.objects.filter(id_estado__estado="En revisión").count()
+        context['cant_resueltas'] = Denuncia.objects.filter(id_estado__estado="Resuelta").count()
+        context['cant_canceladas'] = Denuncia.objects.filter(id_estado__estado="Cancelada").count()
+        return context
+    
 # Vista para el panel de administrador
 
 @login_required
