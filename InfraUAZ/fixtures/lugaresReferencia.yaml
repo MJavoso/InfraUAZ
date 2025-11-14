@@ -464,7 +464,7 @@
     id_programa: 1
 
 - model: denuncias.LugarReferencia
-  pk: 
+  pk: 67
   fields:
     nombre_lugar: "Almacenes Piso 1"
     id_tipo: 7
