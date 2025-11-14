@@ -19,12 +19,12 @@
     <!-- Total -->
     <div class="col-6 col-md">
         <div class="card border-0 shadow-sm p-3 h-100">
-            <div class="d-flex align-items-center gap-3">
-                <i class="bi bi-file-earmark-text fs-2 text-secondary"></i>
+            <div class="d-flex align-items-center justify-content-between">
                 <div>
                     <p class="text-muted mb-1">Total</p>
                     <h5 class="fw-bold mb-0">{{ total }}</h5>
                 </div>
+                <i class="bi bi-file-earmark-text fs-2 text-secondary"></i>
             </div>
         </div>
     </div>
@@ -32,12 +32,12 @@
     <!-- Pendientes -->
     <div class="col-6 col-md">
         <div class="card border-0 shadow-sm p-3 h-100">
-            <div class="d-flex align-items-center gap-3">
-                <i class="bi bi-exclamation-triangle fs-2 text-warning"></i>
+            <div class="d-flex align-items-center justify-content-between">
                 <div>
                     <p class="text-muted mb-1">Pendientes</p>
                     <h5 class="fw-bold mb-0 text-warning">{{ cant_pendientes }}</h5>
                 </div>
+                <i class="bi bi-exclamation-triangle fs-2 text-warning"></i>
             </div>
         </div>
     </div>
@@ -45,12 +45,12 @@
     <!-- En revisión -->
     <div class="col-6 col-md">
         <div class="card border-0 shadow-sm p-3 h-100">
-            <div class="d-flex align-items-center gap-3">
-                <i class="bi bi-clock-history fs-2 text-warning"></i>
+            <div class="d-flex align-items-center justify-content-between">
                 <div>
                     <p class="text-muted mb-1">En Revisión</p>
                     <h5 class="fw-bold mb-0 text-warning">{{ cant_revision  }}</h5>
                 </div>
+                <i class="bi bi-clock-history fs-2 text-warning"></i>
             </div>
         </div>
     </div>
@@ -58,12 +58,12 @@
     <!-- Resueltas -->
     <div class="col-6 col-md">
         <div class="card border-0 shadow-sm p-3 h-100">
-            <div class="d-flex align-items-center gap-3">
-                <i class="bi bi-check-circle fs-2 text-primary"></i>
+            <div class="d-flex align-items-center justify-content-between">
                 <div>
                     <p class="text-muted mb-1">Resueltas</p>
                     <h5 class="fw-bold mb-0 text-primary">{{ cant_resueltas }}</h5>
                 </div>
+                <i class="bi bi-check-circle fs-2 text-primary"></i>
             </div>
         </div>
     </div>
@@ -86,8 +86,9 @@
                 <select id="tipo_denuncia" name="tipo_denuncia" class="form-select">
                     <option value="">Seleccione un tipo</option>
                     {% for tipo in tipo_denuncia %}
-                        <option value="{{ tipo.id_tipo_denuncia }}">
-                         {{ tipo.descripcion }}</option>
+                        <option value="{{ tipo.id_tipo_denuncia }}"
+                            {% if filtros.tipo_denuncia == tipo.id_tipo_denuncia|stringformat:"s" %} selected {% endif %}>
+                            {{ tipo.descripcion }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -215,7 +216,7 @@
                         <small  class="text-muted d-flex justify-content-between align-items-center">
                              <!-- IZQUIERDA -->
                             <span>
-                                📍 {{ denuncia.id_lugar.id_programa.id_edificio.nombre }} – {{ denuncia.id_lugar.nombre_lugar }}
+                                📍 {{ denuncia.id_lugar.id_programa.id_edificio.nombre }} - {{denuncia.id_lugar.id_programa.nombre_programa}} – {{ denuncia.id_lugar.nombre_lugar }}
                             </span>
 
                             <!-- DERECHA -->
@@ -236,8 +237,6 @@
 
                     </div>
                 </a>
-                {% empty %}
-                <p class="text-muted">No hay denuncias registradas.</p>
                 {% endfor %}
             </div>
 
@@ -279,10 +278,14 @@
 {% block scripts %}
     <script>
         function limpiarFiltro(){
-            document.getElementById('tipo_denuncia').value = "";  // esto solo me ayuda a vaciar la seleccion
+             // Vacía los campos del filtro
+            document.getElementById('tipo_denuncia').value = "";  
             document.getElementById('estado').value = "";
             document.getElementById('fechai').value = "";
             document.getElementById('fechaf').value = "";
+
+            // Recargar la página sin parámetros (la URL base sin query string)
+            window.location.href = window.location.pathname;
         }
     </script>
 {% endblock scripts %}

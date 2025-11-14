@@ -19,8 +19,8 @@
         </h1>
         <p class="text-muted" style="font-size: 16px;">Bienvenido, {{ request.user.nombre }}</p>
       </div>
-      <button class="btn btn-warning text-white px-4 py-2">
-        <i class="bi bi-plus-lg me-2"></i>Nueva Denuncia
+      <button class="btn btn-warning text-white px-4 py-2" href="{% url 'crear_denuncia' %}">
+        <i class="bi bi-plus-lg me-2" ></i>Nueva Denuncia
       </button>
     </div>
 
@@ -28,12 +28,12 @@
     <!-- Total -->
     <div class="col-6 col-md">
         <div class="card border-0 shadow-sm p-3 h-100">
-            <div class="d-flex align-items-center gap-3">
-                <i class="bi bi-file-earmark-text fs-2 text-secondary"></i>
+            <div class="d-flex align-items-center justify-content-between">
                 <div>
                     <p class="text-muted mb-1">Total</p>
                     <h5 class="fw-bold mb-0">{{ total }}</h5>
                 </div>
+                <i class="bi bi-file-earmark-text fs-2 text-secondary"></i>
             </div>
         </div>
     </div>
@@ -41,12 +41,12 @@
     <!-- Pendientes -->
     <div class="col-6 col-md">
         <div class="card border-0 shadow-sm p-3 h-100">
-            <div class="d-flex align-items-center gap-3">
-                <i class="bi bi-exclamation-triangle fs-2 text-warning"></i>
+            <div class="d-flex align-items-center justify-content-between">
                 <div>
                     <p class="text-muted mb-1">Pendientes</p>
                     <h5 class="fw-bold mb-0 text-warning">{{ cant_pendientes }}</h5>
                 </div>
+                <i class="bi bi-exclamation-triangle fs-2 text-warning"></i>
             </div>
         </div>
     </div>
@@ -54,12 +54,12 @@
     <!-- En revisión -->
     <div class="col-6 col-md">
         <div class="card border-0 shadow-sm p-3 h-100">
-            <div class="d-flex align-items-center gap-3">
-                <i class="bi bi-clock-history fs-2 text-warning"></i>
+              <div class="d-flex align-items-center justify-content-between">
                 <div>
                     <p class="text-muted mb-1">En Revisión</p>
                     <h5 class="fw-bold mb-0 text-warning">{{ cant_revision  }}</h5>
                 </div>
+                <i class="bi bi-clock-history fs-2 text-warning"></i>
             </div>
         </div>
     </div>
@@ -67,23 +67,23 @@
     <!-- Resueltas -->
     <div class="col-6 col-md">
         <div class="card border-0 shadow-sm p-3 h-100">
-            <div class="d-flex align-items-center gap-3">
-                <i class="bi bi-check-circle fs-2 text-primary"></i>
+            <div class="d-flex align-items-center justify-content-between">
                 <div>
                     <p class="text-muted mb-1">Resueltas</p>
                     <h5 class="fw-bold mb-0 text-primary">{{ cant_resueltas }}</h5>
                 </div>
+                <i class="bi bi-check-circle fs-2 text-primary"></i>
             </div>
         </div>
     </div>
     <div class="col-6 col-md">
         <div class="card border-0 shadow-sm p-3 h-100">
-            <div class="d-flex align-items-center gap-3">
-                <i class="bi bi-x-circle fs-2 text-danger"></i>
+            <div class="d-flex align-items-center justify-content-between">
                 <div>
                     <p class="text-muted mb-1">Canceladas</p>
                     <h5 class="fw-bold mb-0 text-danger">{{ cant_canceladas }}</h5>
                 </div>
+                <i class="bi bi-x-circle fs-2 text-danger"></i>
             </div>
         </div>
     </div>
@@ -129,37 +129,55 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>Título</th>
-                                    <th>Denunciante</th>
                                     <th>Tipo</th>
-                                    <th>Descripción</th>
                                     <th>Estado</th>
+                                    <th>Descripción</th>
                                     <th>Fecha</th>
                                 </tr>
                             </thead>
                             <!-- Lista de denuncias -->
-                            <tbody>
+                            <tbody>|
                                 {% for denuncia in denuncias %}
                                 <tr>
                                     <td>{{ denuncia.título }}</td>
-                                    <td>{{ denuncia.id_denunciante.usuario.nombre }}</td>
-                                    <td>{{ denuncia.id_tipo_denuncia.descripcion }}</td>
-                                    <td>{{ denuncia.descripcion }}</td>
                                     <td>
                                         <span class="badge 
                                             {% if denuncia.id_estado.estado == 'PENDIENTE' %}
-                                                bg-warning text-dark 
+                                                bg-warning text-white fw-bold 
                                             {% elif denuncia.id_estado.estado == 'EN_PROCESO' %}
-                                                bg-info text-dark
+                                                bg-warning text-white fw-bold
                                             {% elif denuncia.id_estado.estado == 'RESUELTA' %}
-                                                bg-success
+                                                bg-warning text-white fw-bold
                                             {% elif denuncia.id_estado.estado == 'CANCELADA' %}
-                                                bg-danger
+                                                bg-warning text-danger fw-bold
                                             {% else %}
                                                 bg-secondary
                                             {% endif %}">
-                                            {{ denuncia.id_estado.estado }}
+                                             {{ denuncia.id_tipo_denuncia.descripcion }}
+                                        </span>
+                                        <p class="text-muted small mb-0 mt-1">
+                                            📍 {{ denuncia.id_lugar.id_programa.id_edificio.nombre }} -
+                                            {{ denuncia.id_lugar.id_programa.nombre_programa }} –
+                                            {{ denuncia.id_lugar.nombre_lugar }}
+                                        </p>
+
+                                    </td>
+                                    <td>
+                                       <span>
+                                            {% if denuncia.id_estado.estado == 'PENDIENTE' %}
+                                                <span class="text-warning"><i class="bi bi-exclamation-triangle"></i> Pendiente</span>
+                                            {% elif denuncia.id_estado.estado == 'EN_PROCESO' %}
+                                                <span class="text-warning"><i class="bi bi-clock-history"></i> En revisión</span>
+                                            {% elif denuncia.id_estado.estado == 'RESUELTA' %}
+                                                <span class="text-warning"><i class="bi bi-check-circle"></i> Resuelta</span>
+                                            {% elif denuncia.id_estado.estado == 'CANCELADA' %}
+                                                <span class="text-danger"><i class="bi bi-x-circle fs-2"></i> Cancelada</span>
+                                            {% else %}
+                                                <span class="text-muted">{{ denuncia.id_estado.estado }}</span>
+                                            {% endif %}
                                         </span>
                                     </td>
+                                    <td>{{ denuncia.descripcion }}</td>
                                     <td>{{ denuncia.fecha|date:"d/m/Y" }}</td>
                                 </tr>
                                 {% empty %}
