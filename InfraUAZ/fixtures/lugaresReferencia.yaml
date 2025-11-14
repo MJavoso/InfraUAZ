@@ -148,13 +148,324 @@
 - model: denuncias.LugarReferencia
   pk: 22
   fields:
-    nombre_lugar: "Centro de computación 1"
+    nombre_lugar: "Centro de cómputo IC-1"
     id_tipo: 2
-    id_programa: 2
+    id_programa: 3
 
 - model: denuncias.LugarReferencia
   pk: 23
   fields:
-    nombre_lugar: "Centro de computación 2"
+    nombre_lugar: "Centro de cómputo IC-2"
+    id_tipo: 2
+    id_programa: 3
+
+- model: denuncias.LugarReferencia
+  pk: 24
+  fields:
+    nombre_lugar: "Soporte técnico IC"
+    id_tipo: 2
+    id_programa: 3
+
+- model: denuncias.LugarReferencia
+  pk: 25
+  fields:
+    nombre_lugar: "Laboratorio de redes"
+    id_tipo: 2
+    id_programa: 3
+
+- model: denuncias.LugarReferencia
+  pk: 26
+  fields:
+    nombre_lugar: "Oficina del Programa Ing. Computación"
+    id_tipo: 6
+    id_programa: 3
+
+- model: denuncias.LugarReferencia
+  pk: 27
+  fields:
+    nombre_lugar: "Cubículo de profesores"
+    id_tipo: 1
+    id_programa: 3
+
+- model: denuncias.LugarReferencia
+  pk: 28
+  fields:
+    nombre_lugar: "Ocina del Programa Ing. Software "
+    id_tipo: 6 
+    id_programa: 2
+  
+- model: denuncias.LugarReferencia
+  pk: 29 
+  fields:
+    nombre_lugar: "Centro de cómputo IS-1"
     id_tipo: 2
     id_programa: 2
+  
+- model: denuncias.LugarReferencia
+  pk: 30
+  fields:
+    nombre_lugar: "Laboratorio TIC"
+    id_tipo: 2
+    id_programa: 3
+
+- model: denuncias.LugarReferencia
+  pk: 31 
+  fields:
+    nombre_lugar: "Cubículo de alumnos"
+    id_tipo: 1
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 32 
+  fields:
+    nombre_lugar: "Laboratorio de Circuitos Eléctricos"
+    id_tipo: 2
+    id_programa: 3 
+
+- model: denuncias.LugarReferencia
+  pk: 33
+  fields:
+    nombre_lugar: "Laboratorio de Electrónica y Sistema de Comunicación de Datos"
+    id_tipo: 2
+    id_programa: 3
+    
+- model: denuncias.LugarReferencia
+  pk: 34
+  fields:
+    nombre_lugar: "Almacen Piso 3"
+    id_tipo: 7
+    id_programa: 3
+
+- model: denuncias.LugarReferencia
+  pk: 35
+  fields:
+    nombre_lugar: "Laboratorio de Electrónica Digital"
+    id_tipo: 2
+    id_programa: 3
+
+- model: denuncias.LugarReferencia
+  pk: 36
+  fields:
+    nombre_lugar: "Laboratorio de Arquitectura de Computadoras y Microprocesadores"
+    id_tipo: 2
+    id_programa: 3 
+
+- model: denuncias.LugarReferencia
+  pk: 37
+  fields: 
+    nombre_lugar: "Laboratorio de Redes de Sensores y Cómputo Aplicado"
+    id_tipo: 2
+    id_programa: 3 
+
+- model: denuncias.LugarReferencia
+  pk: 38 
+  fields: 
+    nombre_lugar: "Laboratorio de Innovación y Tecnología Computacional"
+    id_tipo: 2
+    id_programa: 2 
+- model: denuncias.LugarReferencia
+  pk: 39
+  fields:
+    nombre_lugar: "Audiovisual"
+    id_tipo: 2
+    id_programa: 2
+
+- model: denuncias.LugarReferencia
+  pk: 40
+  fields:
+    nombre_lugar: "Sala de Videoconferencia"
+    id_tipo: 2
+    id_programa: 2 
+
+- model: denuncias.LugarReferencia
+  pk: 41
+  fields:
+    nombre_lugar: "Salón 1"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 42
+  fields:
+    nombre_lugar: "Salón 2"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 43
+  fields:
+    nombre_lugar: "Salón 3"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 44
+  fields:
+    nombre_lugar: "Salón 4"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 45
+  fields:
+    nombre_lugar: "Salón 5"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 46
+  fields:
+    nombre_lugar: "Salón 6"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 47
+  fields:
+    nombre_lugar: "Salón 7"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 48
+  fields:
+    nombre_lugar: "Salón 8"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 49
+  fields:
+    nombre_lugar: "Salón 9"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 50
+  fields:
+    nombre_lugar: "Salón 10"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 51
+  fields:
+    nombre_lugar: "Salón 11"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 52
+  fields:
+    nombre_lugar: "Salón 12"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 53
+  fields:
+    nombre_lugar: "Salón 13"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 54
+  fields:
+    nombre_lugar: "Salón 14"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 55
+  fields:
+    nombre_lugar: "Salón 15"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 55
+  fields:
+    nombre_lugar: "Salón 15"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 56
+  fields:
+    nombre_lugar: "Baños Piso 1"
+    id_tipo: 5
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 57
+  fields:
+    nombre_lugar: "Baños Piso 2"
+    id_tipo: 5
+    id_programa: 1
+- model: denuncias.LugarReferencia
+  pk: 58
+  fields:
+    nombre_lugar: "Baños Piso 3"
+    id_tipo: 5
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 59
+  fields:
+    nombre_lugar: "Sala Audivisual"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 60
+  fields:
+    nombre_lugar: "Laboratorio Remotos e IOT"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 61
+  fields:
+    nombre_lugar: "Laboratorio de Microsistemas"
+    id_tipo: 2
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 62
+  fields:
+    nombre_lugar: "Laboratorio de Mecatrónica"
+    id_tipo: 2
+    id_programa: 1
+- model: denuncias.LugarReferencia
+  pk: 63
+  fields:
+    nombre_lugar: "Secretaria Administrativa o Académica"
+    id_tipo: 6
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 64
+  fields:
+    nombre_lugar: "SITE"
+    id_tipo: 1
+    id_programa: 1
+- model: denuncias.LugarReferencia
+  pk: 65
+  fields:
+    nombre_lugar: "Jefatura de Programa Ing. Mecatrónica"
+    id_tipo: 6
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 66
+  fields:
+    nombre_lugar: "CASE y Servicio Social"
+    id_tipo: 6
+    id_programa: 1
+
+- model: denuncias.LugarReferencia
+  pk: 
+  fields:
+    nombre_lugar: "Almacenes Piso 1"
+    id_tipo: 7
+    id_programa: 1

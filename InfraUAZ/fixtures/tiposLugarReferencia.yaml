@@ -18,3 +18,48 @@
   pk: 5
   fields:
     nombre_tipo: BAÑO
+- model: denuncias.TipoLugarReferencia
+  pk: 6
+  fields:
+    nombre_tipo: OFICINA
+- model: denuncias.TipoLugarReferencia
+  pk: 7
+  fields:
+    nombre_tipo: ALMACEN
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

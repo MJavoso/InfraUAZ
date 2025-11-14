@@ -144,7 +144,7 @@ def muro_denuncias(request: HttpRequest):
         elif fechaf:
             denuncias = denuncias.filter(fecha__lte=fechaf)   # Hasta fecha final
     else:
-        denuncias.order_by('-fecha')
+        denuncias.filter(id_estado = 1).order_by('-fecha')
     paginator = Paginator(denuncias, 5)  
     page_number = request.GET.get('page') 
     denuncias_paginadas = paginator.get_page(page_number) 
