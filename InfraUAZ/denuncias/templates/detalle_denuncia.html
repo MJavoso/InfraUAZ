@@ -3,6 +3,10 @@
 {% load static %}
 <!-- Título de la página -->
 {% block titulo %}Detalle de la Denuncia{% endblock titulo %}
+
+{% block links %}
+    <link rel="stylesheet" href="{% static 'css/modal.css' %}">
+{% endblock links %}
 <!-- Contenido de la página -->
 {% block contenido %}
     <!-- Barra de navegación -->
