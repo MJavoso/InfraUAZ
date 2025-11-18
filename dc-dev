@@ -1,0 +1,10 @@
+#!/bin/bash
+# Script para facilitar el uso de docker compose en desarrollo
+
+COMPOSE_FILE="docker-compose.dev.yaml"
+
+if command -v docker &> /dev/null && docker compose version &> /dev/null; then
+    docker compose -f $COMPOSE_FILE "$@"
+else
+    docker-compose -f $COMPOSE_FILE "$@"
+fi
