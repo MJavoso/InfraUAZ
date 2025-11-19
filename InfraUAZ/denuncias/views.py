@@ -1,14 +1,15 @@
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 
-from usuarios.models import Denunciante
+from usuarios.models import Denunciante, Administrador
 from .forms import DenunciaForm
-from .models import ProgramaAcademico, LugarReferencia, Denuncia, Insumo, TipoDenuncia, EstadoDenuncia
-from django.http import JsonResponse 
+from .models import ProgramaAcademico, LugarReferencia, Denuncia, Insumo, TipoDenuncia, EstadoDenuncia, FotografiaEvidencia
+from django.http import HttpResponseForbidden, JsonResponse
 from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView
 from django.core.paginator import Paginator
+
 #------------------ Vista de detalle de denuncia ------------------#
 def detalle_denuncia(request, id_denuncia):
     # Obtener la denuncia por su ID o devolver un error 404 si no existe
@@ -75,6 +76,8 @@ def agregar_insumo(request, id_denuncia):
 @login_required
 def crear_denuncia (request: HttpRequest):
     denuncia_form = DenunciaForm()
+    if request.user.is_staff:
+        return HttpResponseForbidden("No puedes registrar una denuncia.")
     if request.method == 'POST':
         denuncia_form = DenunciaForm(request.POST)
         id_programa = request.POST.get('programa')
@@ -85,18 +88,25 @@ def crear_denuncia (request: HttpRequest):
         if id_lugar:
             denuncia_form.fields['lugarReferencia'].queryset = LugarReferencia.objects.filter(id_lugar=id_lugar)
         if denuncia_form.is_valid():
-            denuncia_form.save(request.user)
+            denuncia = denuncia_form.save(request.user)
+            fotos = request.FILES.getlist('fotos')
+            for foto in fotos:
+                FotografiaEvidencia.objects.create(
+                    uriFoto = foto,
+                    id_denuncia = denuncia
+                )
             return redirect('muro_denuncias')
         else:
             print(denuncia_form.errors)
     context = {'denuncia_form':denuncia_form}
     return render(request, 'crear_denuncia.html',context)
-
+login_required
 def filtrar_programas_por_edificio(request, id_edificio):
     programas = ProgramaAcademico.objects.filter(id_edificio_id=id_edificio)
     data = [{"id": p.id_programa, "nombre": p.nombre_programa} for p in programas]
     return JsonResponse(data, safe=False)
 
+@login_required
 def lugar_referencia(request, id_programa, id_tipolugar):
     lugares_referencia = LugarReferencia.objects.filter(
         id_programa_id=id_programa,
@@ -105,23 +115,7 @@ def lugar_referencia(request, id_programa, id_tipolugar):
     data = [{"id": lr.id_lugar, "nombre": lr.nombre_lugar} for lr in lugares_referencia]
     return JsonResponse(data, safe=False)
 
-class DenunciasListView(ListView):
-    model=Denuncia
-    template_name = 'muro_denuncias.html'
-    paginate_by = 5
 
-    def get_context_data(self, **kwargs):
-        context =  super().get_context_data(**kwargs)
-        context['tipo_denuncia'] = TipoDenuncia.objects.all()
-        context['estado_denuncia'] = EstadoDenuncia.objects.all()
-        context['cant_pendientes'] = Denuncia.objects.filter(id_estado = 1).count()
-        context['cant_revision'] = Denuncia.objects.filter(id_estado = 2).count()
-        context['cant_resueltas'] = Denuncia.objects.filter(id_estado = 3).count()
-
-
-        return context
-
-@login_required
 def muro_denuncias(request: HttpRequest):
     denuncias = Denuncia.objects.all()
     tipo = TipoDenuncia.objects.all()
@@ -143,7 +137,7 @@ def muro_denuncias(request: HttpRequest):
         elif fechaf:
             denuncias = denuncias.filter(fecha__lte=fechaf)   # Hasta fecha final
     else:
-        denuncias.filter(id_estado = 1).order_by('-fecha')
+        denuncias = denuncias.filter(id_estado__in=[1,2]).order_by('-fecha')
     paginator = Paginator(denuncias, 5)  
     page_number = request.GET.get('page') 
     denuncias_paginadas = paginator.get_page(page_number) 
@@ -156,8 +150,11 @@ def muro_denuncias(request: HttpRequest):
     return render(request, 'muro_denuncias.html', context)
 
 @login_required
-def perfil(request:HttpRequest ): 
-
+def perfil(request:HttpRequest ):        
+    
+    if request.user.is_staff:
+        return HttpResponseForbidden("No puedes ingresar a perfil por que eres administrador.")
+    
     id_denunciante =  Denunciante.objects.get(usuario=request.user).id_denunciante 
     denuncias = Denuncia.objects.filter(id_denunciante=id_denunciante)
     tipos = TipoDenuncia.objects.all()
@@ -178,9 +175,12 @@ def perfil(request:HttpRequest ):
         if id_estado :
             denuncias = denuncias.filter(id_estado = id_estado)
     else:
-        denuncias.order_by('-fecha')
+        denuncias = denuncias.order_by('-fecha')
+    paginator = Paginator(denuncias, 5)  
+    page_number = request.GET.get('page') 
+    denuncias_paginadas = paginator.get_page(page_number)
     context = {
-        'denuncias':denuncias,
+        'denuncias':denuncias_paginadas,
         'tipos': tipos,
         'estados' : estados,
         'total':total,

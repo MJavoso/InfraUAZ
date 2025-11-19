@@ -38,7 +38,7 @@
         </li>
 
         <!-- Nueva denuncia -->
-        {% if request.user.is_authenticated %}
+        {% if request.user.is_authenticated and not request.user.is_staff %}
         <li class="nav-item mx-1">
           <a class="nav-link fw-semibold text-dark" href="{% url 'crear_denuncia' %}">
             <i class="bi bi-plus-lg"></i> Nueva denuncia
@@ -54,17 +54,9 @@
             <i class="bi bi-shield-lock"></i> Panel 
           </a>
         </li>
-
-        <li class="nav-item mx-1">
-          <a class="nav-link text-dark fw-semibold {% if request.resolver_match.url_name == 'perfil_admin' %}active{% endif %}" 
-            href="{% url 'perfil_admin' %}"> 
-            <i class="bi bi-person"></i> Perfil
-          </a>
-        </li>
-
         {% else %}
         <!-- Perfil del denunciante -->
-        {% if request.user.is_authenticated %}
+        {% if request.user.is_authenticated and not request.user.is_staff %}
         <li class="nav-item mx-1">
           <a class="btn btn-outline-primary {% if request.resolver_match.url_name == 'perfil' %}active text-white{% endif %}"
              href="{% url 'perfil' %}">
