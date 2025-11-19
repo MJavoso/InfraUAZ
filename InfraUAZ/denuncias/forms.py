@@ -38,6 +38,10 @@ class DenunciaForm(forms.Form):
         })
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['tipo_denuncia'].label_from_instance = lambda obj: obj.descripcion.lower().capitalize()
+
 
     edificio = forms.ModelChoiceField(
         queryset=Edificio.objects.all(),
@@ -92,7 +96,7 @@ class DenunciaForm(forms.Form):
         denuncia = Denuncia.objects.create(
             fecha = timezone.now().date(),
             título = título,
-            id_estado = EstadoDenuncia.objects.get(estado = 'EN_PROCESO'),
+            id_estado = EstadoDenuncia.objects.get(estado = 'PENDIENTE'),
             descripcion=descripcion,
             id_denunciante = Denunciante.objects.get(usuario=usuario),
             id_lugar = id_lugar,

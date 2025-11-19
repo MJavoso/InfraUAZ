@@ -48,7 +48,7 @@
         </li>
 
         <!-- Nueva denuncia -->
-        {% if request.user.is_authenticated %}
+        {% if request.user.is_authenticated and not request.user.is_staff %}
         <li class="nav-item mx-1">
           <a class="nav-link fw-semibold text-dark" href="{% url 'crear_denuncia' %}">
             <i class="bi bi-plus-lg"></i> Nueva denuncia

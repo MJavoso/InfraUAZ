@@ -51,12 +51,11 @@ class Denuncia(models.Model):
     def __str__(self):
         return self.descripcion
 class FotografiaEvidencia(models.Model):
-    uriFoto = models.CharField(max_length=300, primary_key=True)
-    fecha_subida = models.DateField(null=False, blank=False)
+    id_foto = models.AutoField(primary_key=True)
+    uriFoto = models.ImageField(upload_to='evidencias/')
+    fecha_subida = models.DateField(auto_now_add=True)
     id_denuncia = models.ForeignKey(Denuncia, on_delete=models.RESTRICT, null=False, blank=False)
 
-    def __str__(self):
-        return self.id_denuncia
 class Insumo (models.Model):
     id_insumo = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100, null=False, blank=False)
