@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from usuarios.models import Denunciante, Administrador
 from .forms import DenunciaForm
 from .models import ProgramaAcademico, LugarReferencia, Denuncia, Insumo, TipoDenuncia, EstadoDenuncia, FotografiaEvidencia
-from django.http import JsonResponse
+from django.http import HttpResponseForbidden, JsonResponse
 from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView
@@ -76,6 +76,8 @@ def agregar_insumo(request, id_denuncia):
 @login_required
 def crear_denuncia (request: HttpRequest):
     denuncia_form = DenunciaForm()
+    if request.user.is_staff:
+        return HttpResponseForbidden("No puedes registrar una denuncia.")
     if request.method == 'POST':
         denuncia_form = DenunciaForm(request.POST)
         id_programa = request.POST.get('programa')
@@ -149,6 +151,10 @@ def muro_denuncias(request: HttpRequest):
 
 @login_required
 def perfil(request:HttpRequest ):        
+    
+    if request.user.is_staff:
+        return HttpResponseForbidden("No puedes ingresar a perfil por que eres administrador.")
+    
     id_denunciante =  Denunciante.objects.get(usuario=request.user).id_denunciante 
     denuncias = Denuncia.objects.filter(id_denunciante=id_denunciante)
     tipos = TipoDenuncia.objects.all()
