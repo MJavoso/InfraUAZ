@@ -42,8 +42,7 @@ def detalle_denuncia(request, id_denuncia):
     return render(request, 'detalle_denuncia.html', contexto)
 
 # Agrega un insumo en la plantilla detalle_denuncia.html
-# en la parte de insumos
-from django.contrib import messages
+
 
 def agregar_insumo(request, id_denuncia):
     # Obtener la denuncia o devolver error 404 si no existe
@@ -195,22 +194,21 @@ def modal_denuncia(request):
 
 # Vista para cambiar el estado de una denuncia
 @login_required
-def cambiar_estado_denuncia(request, id_denuncia):
-    # Si no es administrador; no permitir que cambie el estado de una denuncia
+def cambiar_estado_denuncia(request:HttpRequest, id_denuncia):
+
     if not request.user.is_staff:
         messages.error(request, "No tienes permisos para cambiar el estado.")
         return redirect('detalle_denuncia', id_denuncia=id_denuncia)
-    # Si el método de la solicitud es POST
+
     if request.method == "POST":
-        # Obtener el nuevo estado desde el formulario
         nuevo_estado_id = request.POST.get("nuevo_estado")
-        denuncia_Actual = get_object_or_404(Denuncia, id_denuncia=id_denuncia)
+        denuncia = get_object_or_404(Denuncia, id_denuncia=id_denuncia)
         nuevo_estado = get_object_or_404(EstadoDenuncia, id_estado=nuevo_estado_id)
-        # Actualizar y guardar el estado de la denuncia en la base de datos
-        denuncia_Actual.id_estado = nuevo_estado
-        denuncia_Actual.save()
-        # Mensaje de éxito
-        messages.success(request, f"✅ Estado cambiado a '{nuevo_estado.estado}' correctamente.")
+
+        denuncia.id_estado = nuevo_estado
+        denuncia.save()
+
+        messages.success(request, f"Estado cambiado a '{nuevo_estado.estado}' correctamente.")
         return redirect('detalle_denuncia', id_denuncia=id_denuncia)
-    # Redirigir a la página de detalle de la denuncia si la petición no es POST
+
     return redirect('detalle_denuncia', id_denuncia=id_denuncia)

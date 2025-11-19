@@ -1,9 +1,10 @@
 from django.urls import path
 from . import views
+from denuncias.views import ListView
 
 urlpatterns = [
     # Ruta para la vista de la bandeja de entrada del administrador
-    path('', views.BandejaEntradaAdminListView.as_view(), name='bandeja_entrada_admin'),
+    path('', ListView.as_view(), name='muro_denuncia'),
     # Ruta para la vista del panel de administrador
     path('panel-administrador/', views.panel_administrador, name='panel_administrador'),
     # Ruta para la vista del perfil del administrador
