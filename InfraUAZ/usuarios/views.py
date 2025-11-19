@@ -180,14 +180,16 @@ def logout(request):
     return redirect('login')
 
 @administrador_required
-def editar_admin(request):
+def lista_admins(request):
     admins = Administrador.objects.all()
     form = UpdateAdministradorForm()
     context = {
         "admins": admins,
-        "update_admin_form": form
+        "update_admin_form": form,
+        "admins_totales": admins.count(),
+        "admins_activos": admins.filter(usuario__is_active=True).count()
     }
-    return render(request, 'prueba_editar.html', context=context)
+    return render(request, 'lista_admins.html', context=context)
 
 @administrador_required
 def detalle_admin(request, id_admin: int):
