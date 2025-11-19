@@ -163,7 +163,7 @@ def login_administrador(request: HttpRequest):
                 usuario = Usuario.objects.get(correo=correo)
                 if usuario.check_password(contrasena) and es_administrador(usuario.id):
                     auth_login(request, usuario)
-                    return redirect('bandeja_entrada_admin')# Redirigir a la vista del administrador
+                    return redirect('muro_denuncias')# Redirigir a la vista del administrador
                 else:
                     error = "Correo o contraseña incorrectos"
             except Usuario.DoesNotExist:
