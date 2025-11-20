@@ -77,5 +77,18 @@ if [ "$RUN_SERVER" = true ] ; then
     # Iniciar el servidor (usualmente gunicorn o runserver)
     echo "Iniciando servidor..."
     python init_admin.py
+    python manage.py crontab remove
+    python manage.py crontab add
+    python manage.py crontab show
+
+     # Iniciar el demonio 'cron' en segundo plano. E
+    echo "Iniciando el demonio cron (crond)..."
+ 
+    # redirige los logs del cron al stdout del contenedor, así ves la ejecución de tus jobs.
+    crond -f -L /dev/stdout &
+    
+    # Iniciar el servidor (proceso principal)
+    echo "Iniciando servidor Django..."
     exec python manage.py runserver 0.0.0.0:8000
+    
 fi

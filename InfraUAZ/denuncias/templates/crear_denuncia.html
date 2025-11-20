@@ -184,52 +184,71 @@
             }
         };
     </script>
-
     <script>
-        document.getElementById('photo-upload').addEventListener('change', function(e) {
-    const files = e.target.files;
-    const photoCount = document.getElementById('photoCount');
-    const photoPreview = document.getElementById('photoPreview');
-    
-    const existingCount = photoPreview.childElementCount;
+        const subidaFotos = document.getElementById('photo-upload');
+        const vistaFotos = document.getElementById('photoPreview');
+        const contadorFotos = document.getElementById('photoCount');
+        const maxFotos = 5;
 
-    // Validar máximo 5 TOTAL, no solo por selección
-    if (existingCount + files.length > 5) {
-        alert('Solo puedes tener un máximo de 5 fotografías');
-        this.value = ''; 
-        return;
-    }
+        // Array global para todas las fotos seleccionadas
+        let fotosSeleccionadas = [];
 
-    // Actualizar contador
-    photoCount.textContent = `${existingCount + files.length} / 5`;
+        // Manejar selección de archivos
+        subidaFotos.addEventListener('change', () => {
+            const nuevas = Array.from(subidaFotos.files);
+            const disponibles = maxFotos - fotosSeleccionadas.length;
+            fotosSeleccionadas = fotosSeleccionadas.concat(nuevas.slice(0, disponibles));
+            actualizarVista(fotosSeleccionadas);
+            actualizarContador(fotosSeleccionadas.length);
+        });
 
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+        // Actualizar previsualización
+        function actualizarVista(fotos) {
+            vistaFotos.innerHTML = '';
+            fotos.forEach((foto, indice) => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const div = document.createElement('div');
+                    div.classList.add('position-relative');
 
-        if (file.size > 5 * 1024 * 1024) {
-            alert(`La imagen "${file.name}" excede el tamaño máximo de 5MB`);
-            continue;
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'img-thumbnail';
+                    img.style.width = '100px';
+                    img.style.height = '100px';
+                    img.style.objectFit = 'cover';
+
+                    const btnCerrar = document.createElement('button');
+                    btnCerrar.type = 'button';
+                    btnCerrar.className = 'btn-close position-absolute top-0 end-0 m-1';
+                    btnCerrar.setAttribute('aria-label', 'Cerrar');
+                    btnCerrar.onclick = () => {
+                        fotosSeleccionadas.splice(indice, 1);
+                        actualizarVista(fotosSeleccionadas);
+                        actualizarContador(fotosSeleccionadas.length);
+                    };
+
+                    div.appendChild(img);
+                    div.appendChild(btnCerrar);
+                    vistaFotos.appendChild(div);
+                };
+                reader.readAsDataURL(foto);
+            });
         }
 
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const imgContainer = document.createElement('div');
-            imgContainer.className = 'position-relative';
+        // Actualizar contador
+        function actualizarContador(cantidad) {
+            contadorFotos.textContent = `${cantidad} / ${maxFotos}`;
+        }
 
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.className = 'img-thumbnail';
-            img.style.width = '100px';
-            img.style.height = '100px';
-            img.style.objectFit = 'cover';
-
-            imgContainer.appendChild(img);
-            photoPreview.appendChild(imgContainer);
-        };
-        reader.readAsDataURL(file);
-    }
-});
+        // Al enviar el formulario, asignar todas las fotos al input
+        document.getElementById('denunciaForm').addEventListener('submit', () => {
+            const dt = new DataTransfer();
+            fotosSeleccionadas.forEach(f => dt.items.add(f));
+            subidaFotos.files = dt.files;
+        });
     </script>
+
 {% endblock scripts %}
     
     
