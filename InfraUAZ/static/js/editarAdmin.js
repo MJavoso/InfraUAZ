@@ -108,10 +108,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
             })
             .then((body) => {
                 if (body.code == 200) {
-                    const modalDiv = document.getElementById("updateAdminModal");
-                    const modal = bootstrap.Modal.getInstance(modalDiv);
-                    modal.hide();
-                    updateAdminForm.reset();
+                    document.location.reload();
                 } else if (body.code == 405) {
                     // Se usó otro método
                 } else if (body.code == 400) {
