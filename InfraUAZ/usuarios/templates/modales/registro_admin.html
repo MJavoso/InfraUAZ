@@ -1,14 +1,5 @@
-{% extends "base.html" %}
-
-{% block titulo %}Agregar Administrador{% endblock %}
-
-{% block contenido %}
-<div class="text-center mt-5">
- 
-</div>
-
 <!-- Modal de administrador -->
-<div class="modal show d-block" id="adminModal" tabindex="-1" aria-labelledby="adminModalLabel" aria-hidden="false" style="background-color: rgba(0,0,0,0.5);">
+<div class="modal fade" id="newAdminModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="background-color: rgba(0,0,0,0.5);">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content shadow-lg border-0 rounded-4">
 
@@ -37,36 +28,36 @@
           {% csrf_token %}
 
           <!-- Errores no asociados que no van a un campo específico -->
-          {{ form.non_field_errors }}
+          {{ registro_admin_form.non_field_errors }}
 
           <div class="mb-3">
-            {{ form.nombre.label_tag }} <span class="text-danger">*</span>
-            {{ form.nombre }}
-            {{ form.nombre.errors }}
+            {{ registro_admin_form.nombre.label_tag }} <span class="text-danger">*</span>
+            {{ registro_admin_form.nombre }}
+            {{ registro_admin_form.nombre.errors }}
           </div>
 
           <div class="mb-3">
-            {{ form.correo.label_tag }} <span class="text-danger">*</span>
-            {{ form.correo }}
-            {{ form.correo.errors }}
+            {{ registro_admin_form.correo.label_tag }} <span class="text-danger">*</span>
+            {{ registro_admin_form.correo }}
+            {{ registro_admin_form.correo.errors }}
           </div>
 
           <div class="mb-3">
-            {{ form.contrasena.label_tag }} <span class="text-danger">*</span>
-            {{ form.contrasena }}
-            {{ form.contrasena.errors }}
+            {{ registro_admin_form.contrasena.label_tag }} <span class="text-danger">*</span>
+            {{ registro_admin_form.contrasena }}
+            {{ registro_admin_form.contrasena.errors }}
           </div>
 
           <div class="mb-3">
-            {{ form.confirmar_contrasena.label_tag }} <span class="text-danger">*</span>
-            {{ form.confirmar_contrasena }}
-            {{ form.confirmar_contrasena.errors }}
+            {{ registro_admin_form.confirmar_contrasena.label_tag }} <span class="text-danger">*</span>
+            {{ registro_admin_form.confirmar_contrasena }}
+            {{ registro_admin_form.confirmar_contrasena.errors }}
           </div>
 
           <div class="mb-3">
-            {{ form.programa_academico.label_tag }} <span class="text-danger">*</span>
-            {{ form.programa_academico }}
-            {{ form.programa_academico.errors }}
+            {{ registro_admin_form.programa_academico.label_tag }} <span class="text-danger">*</span>
+            {{ registro_admin_form.programa_academico }}
+            {{ registro_admin_form.programa_academico.errors }}
           </div>
 
           <div class="d-flex justify-content-end mt-4">
@@ -83,4 +74,3 @@
     </div>
   </div>
 </div>
-{% endblock %}
