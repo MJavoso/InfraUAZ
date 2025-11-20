@@ -4,15 +4,6 @@
   <div class="container-fluid px-4">
 
     <!-- Logo y título -->
-    {% if request.user.is_authenticated and request.user.is_staff %}
-      <a class="navbar-brand d-flex align-items-center" href="{% url 'bandeja_entrada_admin' %}">
-        <span class="bg-primary text-white px-2 py-1 rounded me-2">UAZ</span>
-        <div class="d-flex flex-column">
-          <strong class="text-dark">Sistema de Reportes de Incidentes</strong>
-          <small class="text-secondary">Campus Siglo XXI</small>
-        </div>
-      </a>
-    {% else %}
       <a class="navbar-brand d-flex align-items-center" href="{% url 'muro_denuncias' %}">
         <span class="bg-primary text-white px-2 py-1 rounded me-2">UAZ</span>
         <div class="d-flex flex-column">
@@ -20,7 +11,6 @@
           <small class="text-secondary">Campus Siglo XXI</small>
         </div>
       </a>
-    {% endif %}
 
     <!-- Botón hamburguesa -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarPrincipal"
@@ -36,7 +26,7 @@
         <li class="nav-item mx-1">
           {% if request.user.is_authenticated and request.user.is_staff %}
             <!-- Si el usuario es administrador -->
-            <a class="btn btn-primary text-white fw-semibold" href="{% url 'bandeja_entrada_admin' %}">
+            <a class="btn btn-primary text-white fw-semibold" href="{% url 'muro_denuncias' %}">
               <i class="bi bi-house-door"></i> Inicio
             </a>
           {% else %}
@@ -48,7 +38,7 @@
         </li>
 
         <!-- Nueva denuncia -->
-        {% if request.user.is_authenticated %}
+        {% if request.user.is_authenticated and not request.user.is_staff %}
         <li class="nav-item mx-1">
           <a class="nav-link fw-semibold text-dark" href="{% url 'crear_denuncia' %}">
             <i class="bi bi-plus-lg"></i> Nueva denuncia
@@ -64,17 +54,9 @@
             <i class="bi bi-shield-lock"></i> Panel 
           </a>
         </li>
-
-        <li class="nav-item mx-1">
-          <a class="nav-link text-dark fw-semibold {% if request.resolver_match.url_name == 'perfil_admin' %}active{% endif %}" 
-            href="{% url 'perfil_admin' %}"> 
-            <i class="bi bi-person"></i> Perfil
-          </a>
-        </li>
-
         {% else %}
         <!-- Perfil del denunciante -->
-        {% if request.user.is_authenticated %}
+        {% if request.user.is_authenticated and not request.user.is_staff %}
         <li class="nav-item mx-1">
           <a class="btn btn-outline-primary {% if request.resolver_match.url_name == 'perfil' %}active text-white{% endif %}"
              href="{% url 'perfil' %}">

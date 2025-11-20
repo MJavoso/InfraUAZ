@@ -18,145 +18,13 @@ from denuncias.models import Denuncia, EstadoDenuncia, TipoDenuncia
 from django.shortcuts import render, redirect
 # ListView para la bandeja de entrada
 from django.views.generic import ListView
-# Importación para asegurarse que el usuario se loguee
-from django.contrib.auth.decorators import login_required
-from django.contrib.admin.views.decorators import staff_member_required
-# Importación que asegura que solo los administradores accedan
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.db.models import Q
+from usuarios.utils import administrador_required
 
-# Vista para la bandeja de entrada del administrador
-class BandejaEntradaAdminListView(LoginRequiredMixin, ListView):
-    model = Denuncia
-    template_name = 'administrador/bandeja_entrada_admin.html'
-    context_object_name = 'denuncias'
-    paginate_by = 10
-
-    def get_queryset(self):
-        usuario = self.request.user
-
-        # Si no es administrador o no tiene edificio asignado
-        if not (usuario.is_staff and hasattr(usuario, 'administrador')):
-            return Denuncia.objects.none()
-
-        admin = usuario.administrador
-
-        # Denuncias del edificio del administrador
-        queryset = Denuncia.objects.filter(
-            id_lugar__id_programa__id_edificio=admin.programa_academico.id_edificio
-        ).select_related('id_estado', 'id_tipo_denuncia', 'id_lugar').order_by('-fecha')
-
-        # Capturamos los filtros GET
-        id_tipo_denuncia = self.request.GET.get('tipo_denuncia')
-        id_estado = self.request.GET.get('estado')
-        fecha_inicio = self.request.GET.get('fecha_inicio')
-        fecha_fin = self.request.GET.get('fecha_fin')
-
-        # 🔹 Aplicamos los filtros si existen
-        if id_tipo_denuncia:
-            queryset = queryset.filter(id_tipo_denuncia=id_tipo_denuncia)
-        if id_estado:
-            queryset = queryset.filter(id_estado=id_estado)
-        if fecha_inicio and fecha_fin:
-            queryset = queryset.filter(fecha__range=[fecha_inicio, fecha_fin])
-        elif fecha_inicio:
-            queryset = queryset.filter(fecha__gte=fecha_inicio)
-        elif fecha_fin:
-            queryset = queryset.filter(fecha__lte=fecha_fin)
-
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        """Agrega datos adicionales al contexto para las tarjetas y filtros."""
-        context = super().get_context_data(**kwargs)
-        denuncias_admin = self.get_queryset()
-
-        # Datos para los filtros
-        context['tipo_denuncia'] = TipoDenuncia.objects.all()
-        context['estado_denuncia'] = EstadoDenuncia.objects.all()
-
-        # Contadores actualizados según el queryset filtrado
-        context['total_denuncias'] = denuncias_admin.count()
-        context['cant_pendientes'] = denuncias_admin.filter(id_estado = 1).count()
-        context['cant_revision'] = denuncias_admin.filter(id_estado = 2).count()
-        context['cant_resueltas'] = denuncias_admin.filter(id_estado = 3).count()
-
-        # Mantiene los filtros seleccionados
-        context['filtros'] = self.request.GET
-
-        return context
-
-
-@login_required
-def bandeja_entrada_admin(request: HttpRequest):
-    denuncias = Denuncia.objects.all()
-    tipo = TipoDenuncia.objects.all()
-    estado = EstadoDenuncia.objects.all()
-    total = denuncias.count()
-    if request.method == 'POST':
-        id_tipo_denuncia = request.POST.get('tipo_denuncia')
-        id_estado = request.POST.get('estado')
-        fechai = request.POST.get('fechai')
-        fechaf = request.POST.get('fechaf')
-        if id_tipo_denuncia:
-            denuncias = denuncias.filter(id_tipo_denuncia=id_tipo_denuncia)
-        if id_estado :
-            denuncias = denuncias.filter(id_estado = id_estado)
-        if fechai and fechaf:
-            denuncias = denuncias.filter(fecha__range=(fechai, fechaf))
-        elif fechai:
-            denuncias = denuncias.filter(fecha__gte=fechai)   # Desde fecha inicial
-        elif fechaf:
-            denuncias = denuncias.filter(fecha__lte=fechaf)   # Hasta fecha final
-    else:
-        denuncias.order_by('-fecha')
-    paginator = Paginator(denuncias, 5)  
-    page_number = request.GET.get('page') 
-    denuncias_paginadas = paginator.get_page(page_number) 
-    cant_pendientes = Denuncia.objects.filter(id_estado = 1).count()
-    cant_revision = Denuncia.objects.filter(id_estado = 2).count()
-    cant_resueltas = Denuncia.objects.filter(id_estado = 3).count()
-    context = {'total':total,'denuncias':denuncias, 'tipo_denuncia':tipo, 'denuncias_paginadas':denuncias_paginadas,'estado_denuncia':estado,'cant_pendientes':cant_pendientes, 'cant_revision':cant_revision, 'cant_resueltas':cant_resueltas, 'filtros':request.POST}
-
-
-    return render(request, 'bandeja_entrada_admin.html', context)
-
-# Vista para la bandeja de entrada del administrador
-class BandejaEntradaAdminListView(LoginRequiredMixin, ListView):
-    model = Denuncia
-    template_name = 'administrador/bandeja_entrada_admin.html'
-    context_object_name = 'denuncias'
-    paginate_by = 10  # si quieres paginación
-
-    def get_queryset(self):
-        """Filtra denuncias por el edificio asignado al administrador"""
-        usuario = self.request.user
-        if hasattr(usuario, 'administrador'):
-            admin = usuario.administrador
-            Denuncia.objects.filter(id_lugar__id_programa__id_edificio=admin.programa_academico.id_edificio)
-            # Filtramos por el edificio del programa académico del admin
-            return Denuncia.objects.filter(
-                id_lugar__id_programa__id_edificio=admin.programa_academico.id_edificio
-            ).select_related('id_estado', 'id_tipo_denuncia', 'id_lugar')
-        return Denuncia.objects.none()
-
-    def get_context_data(self, **kwargs):
-        """Agrega los contadores y filtros al contexto"""
-        context = super().get_context_data(**kwargs)
-        # Agregar tipos de denuncia y estados al contexto para los filtros
-        context['tipo_denuncia'] = TipoDenuncia.objects.all()
-        context['estado_denuncia'] = EstadoDenuncia.objects.all()
-        # Contadores de denuncias por estado
-        context['cant_pendientes'] = Denuncia.objects.filter(id_estado__estado="Pendiente").count()
-        context['cant_revision'] = Denuncia.objects.filter(id_estado__estado="En revisión").count()
-        context['cant_resueltas'] = Denuncia.objects.filter(id_estado__estado="Resuelta").count()
-        context['cant_canceladas'] = Denuncia.objects.filter(id_estado__estado="Cancelada").count()
-        return context
-    
 # Vista para el panel de administrador
-
-@login_required
+@administrador_required
 def panel_administrador(request):
     usuario = request.user
     admin = Administrador.objects.filter(usuario=usuario).first()
@@ -217,6 +85,7 @@ def panel_administrador(request):
     return render(request, 'administrador/panel.html', contexto)
 
 # Vista para filtrar las denuncias del panel de denuncias en tiempo real
+@administrador_required
 def filtrar_denuncias_panel(request):
     # Obtener el usuario actual
     usuario = request.user
@@ -257,7 +126,7 @@ def filtrar_denuncias_panel(request):
 
 
 # Vista para generar el PDF del botón 'reporte de denuncias'
-@staff_member_required
+@administrador_required
 def generar_reporte_denuncias_pdf(request):
     # Crear respuesta PDF
     fecha_actual = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -431,7 +300,7 @@ def generar_reporte_denuncias_pdf(request):
     return response
 
 # Vista para el perfil del administrador
-@login_required
+@administrador_required
 def perfil_administrador(request):
     admin = Administrador.objects.filter(usuario=request.user).first()
 
