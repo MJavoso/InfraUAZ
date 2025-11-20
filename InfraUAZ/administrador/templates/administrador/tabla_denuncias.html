@@ -17,19 +17,22 @@
       <td>{{ denuncia.id_tipo_denuncia.descripcion }}</td>
       <td>{{ denuncia.descripcion|truncatechars:60 }}</td>
       <td>
-        <span class="badge 
-          {% if denuncia.id_estado.estado == 'Pendiente' %}
-            bg-warning text-dark
-          {% elif denuncia.id_estado.estado == 'En revisión' %}
-            bg-info text-dark
-          {% elif denuncia.id_estado.estado == 'Resuelta' %}
-            bg-success
-          {% elif denuncia.id_estado.estado == 'Cancelada' %}
-            bg-danger
+        <span class="badge"
+          style="
+          {% if denuncia.id_estado.estado == 'PENDIENTE' %}
+            background-color:#ffc107; color:#000;
+          {% elif denuncia.id_estado.estado == 'EN_PROCESO' %}
+            background-color:#ffc107; color:#000;
+          {% elif denuncia.id_estado.estado == 'RESUELTA' %}
+            background-color:#0d6efd; color:#000;
+          {% elif denuncia.id_estado.estado == 'CANCELADA' %}
+            background-color:#dc3545; color:#000;
           {% else %}
-            bg-secondary
-          {% endif %}">
-          {{ denuncia.id_estado.estado }}
+            background-color:#6c757d; color:white;
+          {% endif %}
+          "
+        >
+          {{ denuncia.id_estado.estado|title }}
         </span>
       </td>
       <td>{{ denuncia.fecha|date:"d/m/Y" }}</td>
