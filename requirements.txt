@@ -3,3 +3,4 @@ psycopg2-binary==2.9.11
 PyYAML==6.0.3
 python-dotenv==1.1.1
 reportlab==4.4.4
+django-crontab==0.7.1
