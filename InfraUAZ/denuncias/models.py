@@ -53,7 +53,7 @@ class Denuncia(models.Model):
 class FotografiaEvidencia(models.Model):
     id_foto = models.AutoField(primary_key=True)
     uriFoto = models.ImageField(upload_to='evidencias/')
-    fecha_subida = models.DateField(auto_now_add=True)
+    fecha_subida = models.DateTimeField(auto_now_add=True)
     id_denuncia = models.ForeignKey(Denuncia, on_delete=models.RESTRICT, null=False, blank=False)
 
 class Insumo (models.Model):

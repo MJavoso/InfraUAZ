@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     'denuncias',
     'usuarios',
     'reportes', 
-    'administrador'
+    'administrador',
+    'django_crontab'
 ]
 
 MIDDLEWARE = [
@@ -160,3 +161,7 @@ EMAIL_HOST_PASSWORD = getenv('SMTP_PASSWORD')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CRONJOBS = [
+    ('*/1 * * * *', 'denuncias.cron.borrar_fotos'),
+]
