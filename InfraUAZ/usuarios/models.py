@@ -45,4 +45,4 @@ class Denunciante(models.Model):
 class Administrador(models.Model):
     id_administrador = models.AutoField(primary_key=True)
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='administrador')
-    programa_academico = models.OneToOneField('denuncias.ProgramaAcademico', on_delete=models.RESTRICT)
+    programa_academico = models.ForeignKey('denuncias.ProgramaAcademico', on_delete=models.RESTRICT)
