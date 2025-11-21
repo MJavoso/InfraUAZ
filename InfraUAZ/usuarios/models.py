@@ -41,7 +41,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 class Denunciante(models.Model):
     id_denunciante = models.AutoField(primary_key=True)
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='denunciante')
-
+    fecha_suspencion = models.DateField(null=True, blank=True)
 class Administrador(models.Model):
     id_administrador = models.AutoField(primary_key=True)
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='administrador')

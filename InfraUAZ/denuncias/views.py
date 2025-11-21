@@ -9,7 +9,8 @@ from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView
 from django.core.paginator import Paginator
-
+from django.utils import timezone
+from datetime import timedelta
 #------------------ Vista de detalle de denuncia ------------------#
 def detalle_denuncia(request, id_denuncia):
     # Obtener la denuncia por su ID o devolver un error 404 si no existe
@@ -18,6 +19,8 @@ def detalle_denuncia(request, id_denuncia):
     estados_denuncia = EstadoDenuncia.objects.all()
     # Obtenemos los insumos asociados a la denuncia
     insumos = Insumo.objects.filter(id_denuncia=denuncia)
+
+    fotos_evidencia = FotografiaEvidencia.objects.filter(id_denuncia=denuncia)
     
     # Si el método de la solicitud es POST y el usuario es administrador, actualizar el estado de la denuncia
     if request.method == "POST" and request.user.is_staff:
@@ -36,6 +39,7 @@ def detalle_denuncia(request, id_denuncia):
         'denuncia': denuncia,
         'estados_denuncia': estados_denuncia,
         'insumos' : insumos,
+        'fotos': fotos_evidencia
     }    
     
     # Renderizar la plantilla con la denuncia obtenida
@@ -100,7 +104,7 @@ def crear_denuncia (request: HttpRequest):
             print(denuncia_form.errors)
     context = {'denuncia_form':denuncia_form}
     return render(request, 'crear_denuncia.html',context)
-login_required
+@login_required
 def filtrar_programas_por_edificio(request, id_edificio):
     programas = ProgramaAcademico.objects.filter(id_edificio_id=id_edificio)
     data = [{"id": p.id_programa, "nombre": p.nombre_programa} for p in programas]
@@ -218,3 +222,35 @@ def cambiar_estado_denuncia(request:HttpRequest, id_denuncia):
         return redirect('detalle_denuncia', id_denuncia=id_denuncia)
 
     return redirect('detalle_denuncia', id_denuncia=id_denuncia)
+
+
+@login_required
+def reportar_denuncia (request: HttpRequest):
+    if not request.user.is_staff:
+        return HttpResponseForbidden("No puedes reportar una denuncia ya que no eres administrador.")
+    if request.method ==  "POST":
+        id_denuncia = request.POST.get("id_denuncia")
+        tiempo_sancion = request.POST.get("tiempoSancion")
+        denuncia = get_object_or_404(Denuncia, id_denuncia=id_denuncia)
+        denuncia.id_estado=EstadoDenuncia.objects.get(id_estado=4)  # Cambiar estado a 'Cancelada'
+        denuncia.save()
+
+        usuario_denunciante = denuncia.id_denunciante.usuario
+        denunciante = Denunciante.objects.get(usuario=usuario_denunciante)
+        if tiempo_sancion and tiempo_sancion != "0":
+
+            if tiempo_sancion == "00":
+                usuario_denunciante.is_active = False
+                usuario_denunciante.save()
+            
+            elif tiempo_sancion in ["1", "3", "7"]:
+                dias_suspension = int(tiempo_sancion)
+                nueva_fecha = timezone.now().date() + timedelta(days=dias_suspension)
+                print(nueva_fecha)
+                denunciante.fecha_suspencion = nueva_fecha
+                usuario_denunciante.is_active = False
+                usuario_denunciante.save()
+                denunciante.save()
+    return redirect('detalle_denuncia', id_denuncia=id_denuncia)
+
+
