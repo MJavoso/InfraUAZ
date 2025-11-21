@@ -15,4 +15,5 @@ urlpatterns = [
     path('programas/<int:id_edificio>/', views.filtrar_programas_por_edificio, name='filtrar_programas_por_edificio'),
     path('lugar_referencia/<int:id_programa>/<int:id_tipolugar>/', views.lugar_referencia, name='lugar_referencia'),
     path('denuncia/', views.modal_denuncia, name='modal_denuncia'),
+    path('reportar-denuncia', views.reportar_denuncia, name='reportar_denuncia'),
 ]
