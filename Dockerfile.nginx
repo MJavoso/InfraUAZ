@@ -1,0 +1,7 @@
+FROM nginx:1.29.3-alpine-perl
+
+# Copia la configuración personalizada
+COPY Nginx/default.conf /etc/nginx/conf.d/default.conf
+
+COPY InfraUAZ/staticfiles/ /InfraUAZ/staticfiles/
+COPY InfraUAZ/media/ /InfraUAZ/media/

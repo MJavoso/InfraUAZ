@@ -31,7 +31,7 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
     ports:
-      - "127.0.0.1:5433:5432"
+      - "5432"
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -40,10 +40,10 @@ services:
   nginx:
     build:
       context: .
-      dockerfile: Dockerfile.nginx.dev
+      dockerfile: Dockerfile.nginx
     container_name: web-app-nginx
     ports:
-      - "127.0.0.1:8000:80"
+      - "8000:80"
     depends_on:
       - web-app
     volumes:

@@ -4,12 +4,14 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest
 from django.http.response import JsonResponse, HttpResponse
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from .forms import DenuncianteForm, LoginForm, AdministradorForm, UpdateAdministradorForm
+from .forms import DenuncianteForm, LoginForm, AdministradorForm, UpdateAdministradorForm, FiltrosListaAdminForm
 from django.forms.forms import ValidationError
 from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
+from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Usuario, Denunciante, Administrador
 from .utils import es_administrador, enviar_correo_activacion, activar_cuenta_denunciante, EmailStatus, administrador_required
 
@@ -70,22 +72,6 @@ def registrar_denunciante(request: HttpRequest):
     else:
         print("Error al enviar el correo")
         return redireccion_fallo(denunciante.id_denunciante)
-
-@administrador_required
-def registro_admin(request):
-    if request.method == "POST":
-        form = AdministradorForm(request.POST)
-        if form.is_valid():
-            form.save()  # <-- ahora hace todo internamente
-            messages.success(request, "Administrador agregado correctamente.")
-            return redirect('registro_admin')
-        else:
-            messages.error(
-                request, "Por favor corrige los errores del formulario.")
-    else:
-        form = AdministradorForm()
-
-    return render(request, 'registro_admin.html', {'form': form})
 
 def reenviar_correo_activacion(request: HttpRequest, uidb64):
     id_denunciante = int(urlsafe_base64_decode(uidb64))
@@ -180,14 +166,59 @@ def logout(request):
     return redirect('login')
 
 @administrador_required
-def editar_admin(request):
+def lista_admins(request: HttpRequest):
     admins = Administrador.objects.all()
-    form = UpdateAdministradorForm()
+    update_admin_form = UpdateAdministradorForm()
+    registro_admin_form = AdministradorForm()
+    filtros_lista_form = FiltrosListaAdminForm(request.GET)
+    mostrar_modal_registro_admin = False
+
+    if request.method == "POST":
+        registro_admin_form = AdministradorForm(request.POST)
+        if registro_admin_form.is_valid():
+            registro_admin_form.save()  # <-- ahora hace todo internamente
+            registro_admin_form = AdministradorForm()
+        else:
+            mostrar_modal_registro_admin = True
+            messages.error(
+                request, "Por favor corrige los errores del formulario.")
+
+    busqueda: str = filtros_lista_form.data.get('busqueda_texto', '').strip()
+    if len(busqueda) > 0:
+        admins = admins.filter(
+            Q(usuario__nombre__icontains=busqueda) |
+            Q(usuario__correo__icontains=busqueda) |
+            Q(programa_academico__nombre_programa__icontains=busqueda)
+        )
+
+    match filtros_lista_form.data.get('estado_cuenta', ''):
+        case 'activos':
+            admins = admins.filter(usuario__is_active=True)
+        case 'inactivos':
+            admins = admins.filter(usuario__is_active=False)
+        case _:
+            pass
+    
+    paginator = Paginator(admins, 10)
+    page_number = int(request.GET.get('page', "1"))
+
+    try:
+        admins_page = paginator.page(page_number)
+    except PageNotAnInteger:
+        admins_page = paginator.page(1)
+    except EmptyPage:
+        admins_page = paginator.page(paginator.num_pages)
+
     context = {
-        "admins": admins,
-        "update_admin_form": form
+        "admins": admins_page,
+        "update_admin_form": update_admin_form,
+        "admins_totales": admins.count(),
+        "admins_activos": admins.filter(usuario__is_active=True).count(),
+        "filtros_lista_form": filtros_lista_form,
+        "registro_admin_form": registro_admin_form,
+        "mostrarModalCrearAdmin": mostrar_modal_registro_admin
     }
-    return render(request, 'prueba_editar.html', context=context)
+    return render(request, 'lista_admins.html', context=context)
 
 @administrador_required
 def detalle_admin(request, id_admin: int):

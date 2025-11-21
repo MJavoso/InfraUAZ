@@ -3,6 +3,7 @@ from .validators import validar_correo_uaz
 from .models import Denunciante, Usuario, Administrador
 from django.core.exceptions import ValidationError
 from denuncias.models import ProgramaAcademico
+from django.db import transaction
 
 class DenuncianteForm(forms.Form):
     nombre = forms.CharField(
@@ -64,22 +65,23 @@ class DenuncianteForm(forms.Form):
         nombre = self.cleaned_data['nombre']
         correo = self.cleaned_data['correo']
         contrasena = self.cleaned_data['contrasena']
-        usuario = Usuario.objects.filter(correo=correo).first()
-        if usuario is not None:
-            if not usuario.verificado:
-                denunciante = Denunciante.objects.filter(usuario=usuario).first()
-                raise forms.ValidationError(
-                    message='Usuario existente. Necesita activar su cuenta',
-                    code='user_exists',
-                    params={
-                        'denunciante_id': denunciante.id_denunciante
-                    }
-                )
-            else:
-                raise forms.ValidationError("El usuario ya existe.")
+        with transaction.atomic():
+            usuario = Usuario.objects.filter(correo=correo).first()
+            if usuario is not None:
+                if not usuario.verificado:
+                    denunciante = Denunciante.objects.filter(usuario=usuario).first()
+                    raise forms.ValidationError(
+                        message='Usuario existente. Necesita activar su cuenta',
+                        code='user_exists',
+                        params={
+                            'denunciante_id': denunciante.id_denunciante
+                        }
+                    )
+                else:
+                    raise forms.ValidationError("El usuario ya existe.")
 
-        usuario = Usuario.objects.create_user(correo=correo, nombre=nombre, contrasena=contrasena)
-        denunciante = Denunciante.objects.create(usuario=usuario)
+            usuario = Usuario.objects.create_user(correo=correo, nombre=nombre, contrasena=contrasena)
+            denunciante = Denunciante.objects.create(usuario=usuario)
         return (usuario, denunciante)
     
 
@@ -129,18 +131,17 @@ class AdministradorForm(forms.Form):
         nombre = self.cleaned_data['nombre']
         contrasena = self.cleaned_data['contrasena']
         programa = self.cleaned_data['programa_academico']
+        with transaction.atomic():
+            usuario = Usuario.objects.create_staff_user(
+                correo=correo,
+                nombre=nombre,
+                contrasena=contrasena
+            )
 
-        
-        usuario = Usuario.objects.create_staff_user(
-            correo=correo,
-            nombre=nombre,
-            contrasena=contrasena
-        )
-
-        admin = Administrador.objects.create(
-            usuario=usuario,
-            programa_academico=programa
-        )
+            admin = Administrador.objects.create(
+                usuario=usuario,
+                programa_academico=programa
+            )
 
         return admin
 
@@ -224,3 +225,28 @@ class UpdateAdministradorForm(forms.Form):
         
         administrador.save()
         administrador.usuario.save()
+
+        return administrador
+
+class FiltrosListaAdminForm(forms.Form):
+    busqueda_texto = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Buscar por nombre, correo o programa..."
+            }
+        )
+    )
+    estado_cuenta = forms.ChoiceField(
+        choices=[
+            ('todos', 'Todos'),
+            ('activos', 'Activos'),
+            ('inactivos', 'Inactivos')
+        ],
+        widget=forms.Select(
+            attrs={
+                "class": "form-select"
+            }
+        )
+    )
