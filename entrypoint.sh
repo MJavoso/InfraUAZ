@@ -28,12 +28,16 @@ function run_migrations() {
 }
 
 function all_fixtures() {
-    python manage.py loaddata edificios
-    python manage.py loaddata estadosDenuncia
-    python manage.py loaddata tiposDenuncia
-    python manage.py loaddata tiposLugarReferencia
-    python manage.py loaddata programasAcademicos
-    python manage.py loaddata lugaresReferencia
+    fixture_names="edificios estadosDenuncia tiposDenuncia tiposLugarReferencia programasAcademicos lugaresReferencia"
+    for fixture in $fixture_names; do
+        if [ -f /var/log/fixtures_loaded.log ] && grep -q "^$fixture$" /var/log/fixtures_loaded.log; then
+            echo "Fixture $fixture ya cargado, omitiendo..."
+            continue
+        fi
+        echo "Cargando fixture: $fixture"
+        python manage.py loaddata "$fixture"
+        echo "$fixture" >> /var/log/fixtures_loaded.log
+    done
 }
 
 while [[ $# -gt 0 ]]; do
@@ -50,6 +54,15 @@ while [[ $# -gt 0 ]]; do
       all_fixtures
       shift
       ;;
+    --fixtures=*)
+      FIXTURES="${1#--migrations=}"
+      FIXTURES=$(echo "$FIXTURES" | tr -d '"')
+      echo "Ejecutando fixtures para $FIXTURES"
+      for fixture in $MIGRATIONS_APPS; do
+        python manage.py loaddata "$fixture"
+      done
+      shift
+      ;;
     --migrations=*)
       MIGRATIONS_APPS="${1#--migrations=}"
       MIGRATIONS_APPS=$(echo "$MIGRATIONS_APPS" | tr -d '"')
@@ -62,6 +75,10 @@ while [[ $# -gt 0 ]]; do
     --migrations)
       make_migrations  # si no se pasó argumento, ejecuta global
       shift
+      ;;
+    --reset-admin)
+      echo "Restaurando la contraseña del administrador por defecto (infrauaz@uaz.edu.mx)..."
+      exec python reset_admin.py
       ;;
     --runserver)
       RUN_SERVER=true
