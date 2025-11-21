@@ -62,7 +62,7 @@ def borrar_fotos():
 def activar_denunciantes():
     denunciantes = Denunciante.objects.filter(fecha_suspencion__isnull=False)
     for denuciante in denunciantes:
-        if denuciante.fecha_suspencion == timezone.now().date():
+        if denuciante.fecha_suspencion >= timezone.now().date():
             usuario_denunciante = denuciante.usuario
             usuario_denunciante.is_active = True
             usuario_denunciante.save()
