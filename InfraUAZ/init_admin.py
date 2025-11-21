@@ -12,7 +12,7 @@ __DEFAULT_PROGRAMA_ID = 2 # Ingeniería de software de acuerdo a los fixtures
 def create_default_admin():
     correo = "infrauaz@uaz.edu.mx"
     nombre = "Administrador provisional"
-    contrasena = "infrauaz_admin.ingsoft$"
+    contrasena = environ.get('ADMIN_DEFAULT_PASSWORD')
 
     if not Usuario.objects.filter(correo=correo).exists():
         usuario = Usuario.objects.create_staff_user(
