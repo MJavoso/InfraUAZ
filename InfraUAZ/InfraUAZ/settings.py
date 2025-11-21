@@ -163,5 +163,6 @@ EMAIL_HOST_PASSWORD = getenv('SMTP_PASSWORD')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRONJOBS = [
-    ('*/1 * * * *', 'denuncias.cron.borrar_fotos'),
+    ('0 0 * * *', 'denuncias.cron.borrar_fotos'),
+    ('0 0 * * *', 'denuncias.cron.activar_denunciantes'),
 ]

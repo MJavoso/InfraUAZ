@@ -190,7 +190,7 @@
 - model: denuncias.LugarReferencia
   pk: 28
   fields:
-    nombre_lugar: "Ofcina del Programa Ing. Software "
+    nombre_lugar: "Oficina del Programa de Ing. Software "
     id_tipo: 6 
     id_programa: 2
   
