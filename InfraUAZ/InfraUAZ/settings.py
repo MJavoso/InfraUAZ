@@ -156,6 +156,7 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = getenv('SMTP_EMAIL')
 EMAIL_HOST_PASSWORD = getenv('SMTP_PASSWORD')
+ACTIVATION_DOMAIN = getenv('EMAIL_ACTIVATION_DOMAIN', '127.0.0.1:8000')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

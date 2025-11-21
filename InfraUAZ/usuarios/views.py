@@ -7,13 +7,12 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from .forms import DenuncianteForm, LoginForm, AdministradorForm, UpdateAdministradorForm, FiltrosListaAdminForm
 from django.forms.forms import ValidationError
 from django.contrib import messages
-from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Usuario, Denunciante, Administrador
-from .utils import es_administrador, enviar_correo_activacion, activar_cuenta_denunciante, EmailStatus, administrador_required
+from .utils import es_administrador, enviar_correo_activacion, activar_cuenta_denunciante, EmailStatus, administrador_required, obtener_dominio
 
 
 def registrar_denunciante(request: HttpRequest):
@@ -54,7 +53,7 @@ def registrar_denunciante(request: HttpRequest):
             return redireccion_formulario(form)
 
     resultado = enviar_correo_activacion(
-        dominio=get_current_site(request).domain,
+        dominio=obtener_dominio(request),
         correo=usuario.correo,
         nombre=usuario.nombre,
         denunciante=denunciante,
@@ -84,7 +83,7 @@ def reenviar_correo_activacion(request: HttpRequest, uidb64):
         return render(request, 'estado_envio_correo.html', context=context)
 
     resultado = enviar_correo_activacion(
-        dominio=get_current_site(request).domain,
+        dominio=obtener_dominio(request),
         correo=usuario.correo,
         nombre=usuario.nombre,
         denunciante=denunciante,
@@ -124,7 +123,7 @@ def login_denunciante(request: HttpRequest):
             contrasena = form.cleaned_data["contrasena"]
             try:
                 usuario = Usuario.objects.get(correo=correo)
-                if usuario.check_password(contrasena):
+                if usuario.is_active and usuario.check_password(contrasena):
                     auth_login(request, usuario)
                     return redirect('muro_denuncias')
                 else:

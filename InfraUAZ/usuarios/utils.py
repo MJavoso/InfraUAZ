@@ -1,4 +1,5 @@
 from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
 from django.urls import reverse
 from django.http import HttpRequest
 from django.http.response import HttpResponseForbidden
@@ -17,6 +18,10 @@ class EmailStatus(Enum):
     USER_FAILED_ACTIVATE = "user_failed_activate"
     USER_ACTIVE = "user_active"
     USER_EXISTS = "user_exists"
+
+def obtener_dominio(request: HttpRequest) -> str:
+    dominio = settings.ACTIVATION_DOMAIN
+    return dominio
 
 def es_administrador(id_usuario: int):
     return Administrador.objects.filter(pk=id_usuario).exists()
