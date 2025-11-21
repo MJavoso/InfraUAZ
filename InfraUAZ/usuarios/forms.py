@@ -230,6 +230,7 @@ class UpdateAdministradorForm(forms.Form):
 
 class FiltrosListaAdminForm(forms.Form):
     busqueda_texto = forms.CharField(
+        required=False,
         widget=forms.TextInput(
             attrs={
                 "class": "form-control",

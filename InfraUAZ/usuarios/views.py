@@ -10,6 +10,8 @@ from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
+from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Usuario, Denunciante, Administrador
 from .utils import es_administrador, enviar_correo_activacion, activar_cuenta_denunciante, EmailStatus, administrador_required
 
@@ -70,20 +72,6 @@ def registrar_denunciante(request: HttpRequest):
     else:
         print("Error al enviar el correo")
         return redireccion_fallo(denunciante.id_denunciante)
-
-""" @administrador_required
-def registro_admin(request):
-    if request.method == "POST":
-        form = AdministradorForm(request.POST)
-        if form.is_valid():
-            form.save()  # <-- ahora hace todo internamente
-        else:
-            messages.error(
-                request, "Por favor corrige los errores del formulario.")
-    else:
-        form = AdministradorForm()
-
-    return render(request, 'registro_admin.html', {'form': form}) """
 
 def reenviar_correo_activacion(request: HttpRequest, uidb64):
     id_denunciante = int(urlsafe_base64_decode(uidb64))
@@ -182,7 +170,7 @@ def lista_admins(request: HttpRequest):
     admins = Administrador.objects.all()
     update_admin_form = UpdateAdministradorForm()
     registro_admin_form = AdministradorForm()
-    filtros_lista_form = FiltrosListaAdminForm()
+    filtros_lista_form = FiltrosListaAdminForm(request.GET)
     mostrar_modal_registro_admin = False
 
     if request.method == "POST":
@@ -195,8 +183,34 @@ def lista_admins(request: HttpRequest):
             messages.error(
                 request, "Por favor corrige los errores del formulario.")
 
+    busqueda: str = filtros_lista_form.data.get('busqueda_texto', '').strip()
+    if len(busqueda) > 0:
+        admins = admins.filter(
+            Q(usuario__nombre__icontains=busqueda) |
+            Q(usuario__correo__icontains=busqueda) |
+            Q(programa_academico__nombre_programa__icontains=busqueda)
+        )
+
+    match filtros_lista_form.data.get('estado_cuenta', ''):
+        case 'activos':
+            admins = admins.filter(usuario__is_active=True)
+        case 'inactivos':
+            admins = admins.filter(usuario__is_active=False)
+        case _:
+            pass
+    
+    paginator = Paginator(admins, 10)
+    page_number = int(request.GET.get('page', "1"))
+
+    try:
+        admins_page = paginator.page(page_number)
+    except PageNotAnInteger:
+        admins_page = paginator.page(1)
+    except EmptyPage:
+        admins_page = paginator.page(paginator.num_pages)
+
     context = {
-        "admins": admins,
+        "admins": admins_page,
         "update_admin_form": update_admin_form,
         "admins_totales": admins.count(),
         "admins_activos": admins.filter(usuario__is_active=True).count(),
