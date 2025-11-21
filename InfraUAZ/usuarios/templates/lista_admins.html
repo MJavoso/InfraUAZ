@@ -1,12 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load filtros_admins_tags %}
 
 {% block titulo %}
 Lista de administradores
 {% endblock titulo %}
-
-
 
 {% block contenido %}
 {% include 'nav_bar.html' %}
@@ -86,14 +84,19 @@ Lista de administradores
                         </div>
                     </div>
 
-                    <form class="d-flex flex-column flex-md-row align-items-center" id="filtrosListaAdminsForm">
+                    <form class="d-flex flex-column align-items-center" id="filtrosListaAdminsForm" method="get">
                         {% csrf_token %}
-                        <div class="flex-md-grow-1 me-0 mb-3 mb-md-0 me-md-3 w-100">
-                            {{ filtros_lista_form.busqueda_texto }}
+                        <div class="d-flex flex-column flex-md-row align-items-center mb-3 w-100">
+                            <div class="flex-md-grow-1 me-0 mb-3 mb-md-0 me-md-3 w-100">
+                                {{ filtros_lista_form.busqueda_texto }}
+                            </div>
+                            <div>
+                                {{ filtros_lista_form.estado_cuenta }}
+                            </div>
                         </div>
-                        <div>
-                            {{ filtros_lista_form.estado_cuenta }}
-                        </div>
+
+                        <button type="submit" class="btn btn-primary mb-3 w-100">Aplicar filtros</button>
+                        <a href="{% url 'lista_admins' %}" class="btn btn-secondary w-100">Restaurar filtros por defecto</a>
                     </form>
                 </div>
 
@@ -131,6 +134,49 @@ Lista de administradores
                             {% endfor %}
                         </tbody>
                     </table>
+
+                    <nav aria-label="Paginación de administradores">
+                        <ul class="pagination justify-content-center">
+                            {% if admins.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{% pagination_url request admins.previous_page_number %}" aria-label="Anterior">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-label="Anterior">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </span>
+                                </li>
+                            {% endif %}
+
+                            {% for num_page in admins.paginator.page_range %}
+                                {% if admins.number == num_page %}
+                                    <li class="page-item active"><span class="page-link">{{ num_page }}</span></li>
+                                {% elif num_page >= admins.number|add:'-2' and num_page <= admins.number|add:'2' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{% pagination_url request num_page %}">{{ num_page }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if admins.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{% pagination_url request admins.next_page_number %}" aria-label="Siguiente">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-label="Siguiente">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </span>
+                                </li>
+                            {% endif %}
+
+                        </ul>
+                    </nav>
                     </div>
                 </div>
             </div>
