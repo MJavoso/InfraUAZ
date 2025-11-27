@@ -1,0 +1,54 @@
+services:
+  web-app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: web-app
+    ports:
+      - "8000"
+    depends_on:
+      - db
+    volumes:
+      - ./InfraUAZ:/InfraUAZ
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: db
+      DB_PORT: 5432
+      
+      SECRET: ${SECRET}
+      SMTP_EMAIL: ${SMTP_EMAIL}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      DEBUG_MODE: ${DEBUG}
+      DISABLE_UAZ_EMAILS: ${DISABLE_UAZ_EMAILS}
+      ADMIN_DEFAULT_PASSWORD: ${ADMIN_DEFAULT_PASSWORD}
+
+  
+  db:
+    image: postgres:16.10-alpine3.22
+    container_name: web-app-db
+    volumes:
+      - db:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5433:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx.dev
+    container_name: web-app-nginx
+    ports:
+      - "127.0.0.1:8000:80"
+    depends_on:
+      - web-app
+    volumes:
+      - ./InfraUAZ/static:/InfraUAZ/static
+      - ./InfraUAZ/media:/InfraUAZ/media
+
+volumes:
+  db:    

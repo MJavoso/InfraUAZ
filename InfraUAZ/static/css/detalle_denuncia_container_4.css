@@ -1,0 +1,10 @@
+/* Asegura que el contenedor del menú tenga un contexto de apilamiento superior */
+.contenedor-botones-superior {
+    /* position: relative;  Normalmente Bootstrap ya se encarga de esto en el padre */
+    z-index: 10; /* Un número mayor que 1. Suficiente para estar por encima del HR */
+}
+
+/* También puedes apuntar directamente al menú desplegable para mayor seguridad */
+.dropdown-menu-center {
+    z-index: 1000; /* Un número muy alto para que nada lo tape */
+}

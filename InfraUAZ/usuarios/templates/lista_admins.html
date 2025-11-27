@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load filtros_admins_tags %}
+
+{% block titulo %}
+Lista de administradores
+{% endblock titulo %}
+
+{% block contenido %}
+{% include 'nav_bar.html' %}
+{% include 'modales/modal_editar_admin.html' %}
+{% include 'modales/registro_admin.html' %}
+<main class="container-fluid px-4 py-3">
+    <div class="row mb-4 d-flex justify-content-between align-items-center">
+        <div class="col-auto">
+            <h4 class="text-primary">Panel de administrador</h4>
+            <h5 class="text-secondary">Gestión y seguimiento de denuncias del campus UAZ Siglo XXI</h5>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Navegación lateral -->
+        <div class="col-12 col-md-3">
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <h6 class="fw-bold text-primary mb-3">NAVEGACIÓN</h6>
+                    <div class="list-group">
+                        <!-- Aqui cuando se presiona se redirecciona a la sección de gestión de denuncias-->
+                        <a href="{% url 'panel_administrador' %}" class="list-group-item list-group-item-action">
+                            <i class="bi bi-clipboard-data me-2"></i> Gestión de Denuncias
+                        </a>
+                        <!-- Aqui cuando se presiona se redirecciona a la sección de gestión de administradores-->
+                        <a href="#" class="list-group-item list-group-item-action active">
+                            <i class="bi bi-people me-2"></i> Gestión de Administradores
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="col-12 col-md-9">
+            <div class="d-flex flex-column flex-md-row align-items-center mb-3 mb-md-0">
+                <div class="d-flex flex-column flex-grow-1">
+                    <div class="d-flex flex-row align-items-center">
+                        <i class="bi bi-shield text-strong-blue fs-3 me-2"></i>
+                        <h2 class="fs-2 fw-bold">Gestión de administradores</h2>
+                    </div>
+                    <p>Administra los usuarios con permisos de administrador del sistema</p>
+                </div>
+
+                <button class="btn btn-primary h-50" data-bs-toggle="modal" data-bs-target="#newAdminModal">
+                    <i class="bi bi-person-add"></i> Agregar administrador
+                </button>
+            </div>
+
+            <div class="d-flex flex-column flex-md-row mb-3">
+                <div class="col col-md-2 flex-grow-1 me-0 mb-3 mb-md-0 me-md-3">
+                    <div class="card border-0 shadow-md p-3">
+                        <p class="text-muted mb-0">Total administradores</p>
+                        <div class="d-flex flex-row align-items-center">
+                            <div class="fs-3 text-strong-blue me-3"><i class="bi bi-exclamation-triangle"></i></div>
+                            <h5 class="fw-bold mb-0 text-strong-blue">{{ admins_totales }}</h5>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col col-md-2 flex-grow-1">
+                    <div class="card border-0 shadow-md p-3">
+                        <p class="text-muted mb-0">Administradores activos</p>
+                        <div class="d-flex flex-row align-items-center">
+                            <div class="fs-3 text-success me-3"><i class="bi bi-shield"></i></div>
+                            <h5 class="fw-bold mb-0 text-success">{{ admins_activos }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white fw-semibold d-flex flex-column justify-content-between">
+                    <div class="d-flex flex-column flex-grow-1">
+                        <div class="d-flex flex-row align-items-center">
+                            <i class="bi bi-shield text-strong-blue fs-3 me-2"></i>
+                            <h3 class="fs-3">Lista de administradores</h3>
+                        </div>
+                    </div>
+
+                    <form class="d-flex flex-column align-items-center" id="filtrosListaAdminsForm" method="get">
+                        {% csrf_token %}
+                        <div class="d-flex flex-column flex-md-row align-items-center mb-3 w-100">
+                            <div class="flex-md-grow-1 me-0 mb-3 mb-md-0 me-md-3 w-100">
+                                {{ filtros_lista_form.busqueda_texto }}
+                            </div>
+                            <div>
+                                {{ filtros_lista_form.estado_cuenta }}
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mb-3 w-100">Aplicar filtros</button>
+                        <a href="{% url 'lista_admins' %}" class="btn btn-secondary w-100">Restaurar filtros por defecto</a>
+                    </form>
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Programa academico</th>
+                                <th>Correo</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for admin in admins %}
+                            <tr>
+                                <td>{{ admin.usuario.nombre }}</td>
+                                <td>{{ admin.programa_academico.nombre_programa }}</td>
+                                <td>{{ admin.usuario.correo }}</td>
+                                <td>
+                                    {% if admin.usuario.is_active %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn" style="background-color: transparent;" onclick="loadAdminData('{{ admin.id_administrador }}')">
+                                        <i class="bi bi-pencil-square text-strong-blue"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <nav aria-label="Paginación de administradores">
+                        <ul class="pagination justify-content-center">
+                            {% if admins.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{% pagination_url request admins.previous_page_number %}" aria-label="Anterior">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-label="Anterior">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </span>
+                                </li>
+                            {% endif %}
+
+                            {% for num_page in admins.paginator.page_range %}
+                                {% if admins.number == num_page %}
+                                    <li class="page-item active"><span class="page-link">{{ num_page }}</span></li>
+                                {% elif num_page >= admins.number|add:'-2' and num_page <= admins.number|add:'2' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{% pagination_url request num_page %}">{{ num_page }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if admins.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{% pagination_url request admins.next_page_number %}" aria-label="Siguiente">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-label="Siguiente">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </span>
+                                </li>
+                            {% endif %}
+
+                        </ul>
+                    </nav>
+                    </div>
+                </div>
+            </div>
+        </section>
+</main>
+{% endblock contenido %}
+
+
+{% block scripts %}
+<script>
+    var updateInfoUrl = "{% url 'actualizar_info_admin' %}";
+    var getAdminUrl = "{% url 'detalle_admin' id_admin=0 %}";
+</script>
+<script src="{% static 'js/editarAdmin.js' %}"></script>
+<script>
+    {% if mostrarModalCrearAdmin %}
+        const divModal = document.getElementById('newAdminModal');
+        const modalCrearAdmin = bootstrap.Modal.getInstance(divModal) ?? new bootstrap.Modal(divModal);
+        modalCrearAdmin.show();
+    {% endif %}
+</script>
+{% endblock scripts %}

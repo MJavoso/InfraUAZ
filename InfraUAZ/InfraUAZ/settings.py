@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-from os import getenv
+from os import getenv, path
+import sys
+from django.urls import reverse_lazy
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +28,15 @@ SECRET_KEY = getenv('SECRET')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getenv('DEBUG_MODE') == 'True'
 
-ALLOWED_HOSTS = ['*']
+if DEBUG:
+    ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost', 'nginx']
+    CSRF_TRUSTED_ORIGINS = [
+        'http://127.0.0.1:8000',
+        'http://localhost:8000'
+    ]
+    print("Debug mode is ON", flush=True)
+
+AUTH_USER_MODEL = 'usuarios.Usuario'
 
 
 # Application definition
@@ -40,7 +50,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'denuncias',
     'usuarios',
-    'reportes'
+    'reportes', 
+    'administrador',
+    'django_crontab'
 ]
 
 MIDDLEWARE = [
@@ -58,7 +70,7 @@ ROOT_URLCONF = 'InfraUAZ.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [ BASE_DIR / 'templates' ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -123,8 +135,39 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = (
+    path.join(BASE_DIR, 'static/'),
+)
+STATIC_ROOT = path.join(BASE_DIR, 'staticfiles/')
+
+MEDIA_ROOT = path.join(BASE_DIR, 'media/')
+MEDIA_URL = '/media/'
+
+LOGIN_URL = reverse_lazy('login') #/usuarios/login
+LOGIN_REDIRECT_URL = reverse_lazy('muro_denuncias')
+LOGOUT_REDIRECT_URL = reverse_lazy('login')
+
+FIXTURE_DIRS = [
+    path.join(BASE_DIR / 'fixtures')
+]
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = getenv('SMTP_EMAIL')
+EMAIL_HOST_PASSWORD = getenv('SMTP_PASSWORD')
+ACTIVATION_DOMAIN = getenv('EMAIL_ACTIVATION_DOMAIN', '127.0.0.1:8000')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CRONJOBS = [
+    ('0 0 * * *', 'denuncias.cron.borrar_fotos'),
+    ('0 0 * * *', 'denuncias.cron.activar_denunciantes'),
+]
+if 'test' in sys.argv:
+    DATABASES['default']['NAME'] = 'test_infrauaz'
+

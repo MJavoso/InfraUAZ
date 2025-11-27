@@ -1,3 +1,256 @@
-from django.shortcuts import render
+from django.contrib import messages
+from django.shortcuts import render, get_object_or_404, redirect
 
-# Create your views here.
+from usuarios.models import Denunciante, Administrador
+from .forms import DenunciaForm
+from .models import ProgramaAcademico, LugarReferencia, Denuncia, Insumo, TipoDenuncia, EstadoDenuncia, FotografiaEvidencia
+from django.http import HttpResponseForbidden, JsonResponse
+from django.http import HttpRequest
+from django.contrib.auth.decorators import login_required
+from django.views.generic import ListView
+from django.core.paginator import Paginator
+from django.utils import timezone
+from datetime import timedelta
+#------------------ Vista de detalle de denuncia ------------------#
+def detalle_denuncia(request, id_denuncia):
+    # Obtener la denuncia por su ID o devolver un error 404 si no existe
+    denuncia = get_object_or_404(Denuncia, id_denuncia=id_denuncia)
+    # Obtenemos todos los estados de denuncia para el formulario de actualización de estado
+    estados_denuncia = EstadoDenuncia.objects.all()
+    # Obtenemos los insumos asociados a la denuncia
+    insumos = Insumo.objects.filter(id_denuncia=denuncia)
+
+    fotos_evidencia = FotografiaEvidencia.objects.filter(id_denuncia=denuncia)
+    
+    # Si el método de la solicitud es POST y el usuario es administrador, actualizar el estado de la denuncia
+    if request.method == "POST" and request.user.is_staff:
+        # Asignar el nuevo estado desde el formulario
+        nuevo_estado_id = request.POST.get("nuevo_estado")
+        if nuevo_estado_id:
+            # Actualizar y guardar el estado de la denuncia
+            denuncia.id_estado_id = nuevo_estado_id
+            denuncia.save()
+            # Mensaje de éxito
+            messages.success(request, "✅ El estado de la denuncia se actualizó correctamente.")
+            return redirect('detalle_denuncia', id_denuncia=denuncia.id_denuncia)
+
+    #Contexto para pasar a la plantilla
+    contexto = {
+        'denuncia': denuncia,
+        'estados_denuncia': estados_denuncia,
+        'insumos' : insumos,
+        'fotos': fotos_evidencia
+    }    
+    
+    # Renderizar la plantilla con la denuncia obtenida
+    return render(request, 'detalle_denuncia.html', contexto)
+
+# Agrega un insumo en la plantilla detalle_denuncia.html
+
+
+def agregar_insumo(request, id_denuncia):
+    # Obtener la denuncia o devolver error 404 si no existe
+    denuncia = get_object_or_404(Denuncia, pk=id_denuncia)
+    # Si no es administrador; no permitir que agregue insumos a una denuncia
+    if not request.user.is_staff:
+        # Mensaje de error
+        messages.error(request, "No tienes permiso para agregar insumos.")
+        return redirect('detalle_denuncia', id_denuncia=id_denuncia)
+    #  Si el método de la solicitud es POST
+    if request.method == "POST":
+        # Extraer los datos del formulario
+        nombre = request.POST.get("nombre")
+        cantidad = request.POST.get("cantidad")
+        costo = request.POST.get("costo")
+        # Crear el insumo y asociarlo con la denuncia
+        Insumo.objects.create(
+            nombre=nombre,
+            cantidad=cantidad,
+            costo=costo,
+            id_denuncia=denuncia
+        )
+        # Mensaje de éxito
+        messages.success(request, "✅ Insumo agregado correctamente.")
+        # Redirigir a la página de detalle de la denuncia
+        return redirect('detalle_denuncia', id_denuncia=id_denuncia)
+    return redirect('detalle_denuncia', id_denuncia=id_denuncia)
+
+
+
+@login_required
+def crear_denuncia (request: HttpRequest):
+    denuncia_form = DenunciaForm()
+    if request.user.is_staff:
+        return HttpResponseForbidden("No puedes registrar una denuncia.")
+    if request.method == 'POST':
+        denuncia_form = DenunciaForm(request.POST)
+        id_programa = request.POST.get('programa')
+        id_lugar = request.POST.get('lugarReferencia')
+        # en esta parte actualizo el queryset de mi formulario, ya que todavia esta none(), por que hago el filtrado en views
+        if id_programa:
+            denuncia_form.fields['programa'].queryset = ProgramaAcademico.objects.filter(id_programa=id_programa)
+        if id_lugar:
+            denuncia_form.fields['lugarReferencia'].queryset = LugarReferencia.objects.filter(id_lugar=id_lugar)
+        if denuncia_form.is_valid():
+            denuncia = denuncia_form.save(request.user)
+            fotos = request.FILES.getlist('fotos')
+            for foto in fotos:
+                FotografiaEvidencia.objects.create(
+                    uriFoto = foto,
+                    id_denuncia = denuncia
+                )
+            return redirect('muro_denuncias')
+        else:
+            print(denuncia_form.errors)
+    context = {'denuncia_form':denuncia_form}
+    return render(request, 'crear_denuncia.html',context)
+@login_required
+def filtrar_programas_por_edificio(request, id_edificio):
+    programas = ProgramaAcademico.objects.filter(id_edificio_id=id_edificio)
+    data = [{"id": p.id_programa, "nombre": p.nombre_programa} for p in programas]
+    return JsonResponse(data, safe=False)
+
+@login_required
+def lugar_referencia(request, id_programa, id_tipolugar):
+    lugares_referencia = LugarReferencia.objects.filter(
+        id_programa_id=id_programa,
+        id_tipo_id=id_tipolugar
+    )
+    data = [{"id": lr.id_lugar, "nombre": lr.nombre_lugar} for lr in lugares_referencia]
+    return JsonResponse(data, safe=False)
+
+
+def muro_denuncias(request: HttpRequest):
+    denuncias = Denuncia.objects.all()
+    tipo = TipoDenuncia.objects.all()
+    estado = EstadoDenuncia.objects.all()
+    total = denuncias.count()
+    if request.method == 'POST':
+        id_tipo_denuncia = request.POST.get('tipo_denuncia')
+        id_estado = request.POST.get('estado')
+        fechai = request.POST.get('fechai')
+        fechaf = request.POST.get('fechaf')
+        if id_tipo_denuncia:
+            denuncias = denuncias.filter(id_tipo_denuncia=id_tipo_denuncia)
+        if id_estado :
+            denuncias = denuncias.filter(id_estado = id_estado)
+        if fechai and fechaf:
+            denuncias = denuncias.filter(fecha__range=(fechai, fechaf))
+        elif fechai:
+            denuncias = denuncias.filter(fecha__gte=fechai)   # Desde fecha inicial
+        elif fechaf:
+            denuncias = denuncias.filter(fecha__lte=fechaf)   # Hasta fecha final
+    else:
+        denuncias = denuncias.filter(id_estado__in=[1,2]).order_by('-fecha')
+    paginator = Paginator(denuncias, 5)  
+    page_number = request.GET.get('page') 
+    denuncias_paginadas = paginator.get_page(page_number) 
+    cant_pendientes = Denuncia.objects.filter(id_estado = 1).count()
+    cant_revision = Denuncia.objects.filter(id_estado = 2).count()
+    cant_resueltas = Denuncia.objects.filter(id_estado = 3).count()
+    context = {'total':total,'denuncias':denuncias, 'tipo_denuncia':tipo, 'denuncias_paginadas':denuncias_paginadas,'estado_denuncia':estado,'cant_pendientes':cant_pendientes, 'cant_revision':cant_revision, 'cant_resueltas':cant_resueltas, 'filtros':request.POST}
+
+
+    return render(request, 'muro_denuncias.html', context)
+
+@login_required
+def perfil(request:HttpRequest ):        
+    
+    if request.user.is_staff:
+        return HttpResponseForbidden("No puedes ingresar a perfil por que eres administrador.")
+    
+    id_denunciante =  Denunciante.objects.get(usuario=request.user).id_denunciante 
+    denuncias = Denuncia.objects.filter(id_denunciante=id_denunciante)
+    tipos = TipoDenuncia.objects.all()
+    estados = EstadoDenuncia.objects.all()
+
+    total = denuncias.count()
+    cant_pendientes = denuncias.filter(id_estado = 1).count()
+    cant_revision = denuncias.filter(id_estado = 2).count()
+    cant_resueltas = denuncias.filter(id_estado = 3).count()
+    cant_canceladas = denuncias.filter(id_estado = 4).count()
+
+    if request.method == 'POST':
+        id_tipo_denuncia = request.POST.get('tipo_denuncia')
+        id_estado = request.POST.get('estado_denuncia')
+
+        if id_tipo_denuncia:
+            denuncias = denuncias.filter(id_tipo_denuncia=id_tipo_denuncia)
+        if id_estado :
+            denuncias = denuncias.filter(id_estado = id_estado)
+    else:
+        denuncias = denuncias.order_by('-fecha')
+    paginator = Paginator(denuncias, 5)  
+    page_number = request.GET.get('page') 
+    denuncias_paginadas = paginator.get_page(page_number)
+    context = {
+        'denuncias':denuncias_paginadas,
+        'tipos': tipos,
+        'estados' : estados,
+        'total':total,
+        'cant_pendientes':cant_pendientes,
+        'cant_revision':cant_revision,
+        'cant_resueltas':cant_resueltas,
+        'cant_canceladas':cant_canceladas,
+        'filtros':request.POST
+
+    }
+    return render (request,'perfil.html', context)
+def modal_denuncia(request):
+    #Despues se procesaran datos aqui
+    return render(request, 'modal_denuncia.html')
+
+# Nueva parte integrada por DAMC
+
+# Vista para cambiar el estado de una denuncia
+@login_required
+def cambiar_estado_denuncia(request:HttpRequest, id_denuncia):
+
+    if not request.user.is_staff:
+        messages.error(request, "No tienes permisos para cambiar el estado.")
+        return redirect('detalle_denuncia', id_denuncia=id_denuncia)
+
+    if request.method == "POST":
+        nuevo_estado_id = request.POST.get("nuevo_estado")
+        denuncia = get_object_or_404(Denuncia, id_denuncia=id_denuncia)
+        nuevo_estado = get_object_or_404(EstadoDenuncia, id_estado=nuevo_estado_id)
+
+        denuncia.id_estado = nuevo_estado
+        denuncia.save()
+
+        messages.success(request, f"Estado cambiado a '{nuevo_estado.estado}' correctamente.")
+        return redirect('detalle_denuncia', id_denuncia=id_denuncia)
+
+    return redirect('detalle_denuncia', id_denuncia=id_denuncia)
+
+
+@login_required
+def reportar_denuncia (request: HttpRequest):
+    if not request.user.is_staff:
+        return HttpResponseForbidden("No puedes reportar una denuncia ya que no eres administrador.")
+    if request.method ==  "POST":
+        id_denuncia = request.POST.get("id_denuncia")
+        tiempo_sancion = request.POST.get("tiempoSancion")
+        denuncia = get_object_or_404(Denuncia, id_denuncia=id_denuncia)
+        denuncia.id_estado=EstadoDenuncia.objects.get(id_estado=4)  # Cambiar estado a 'Cancelada'
+        denuncia.save()
+
+        usuario_denunciante = denuncia.id_denunciante.usuario
+        denunciante = Denunciante.objects.get(usuario=usuario_denunciante)
+        if tiempo_sancion and tiempo_sancion != "0":
+
+            if tiempo_sancion == "00":
+                usuario_denunciante.is_active = False
+                usuario_denunciante.save()
+            
+            elif tiempo_sancion in ["1", "3", "7"]:
+                dias_suspension = int(tiempo_sancion)
+                nueva_fecha = timezone.now().date() + timedelta(days=dias_suspension)
+                print(nueva_fecha)
+                denunciante.fecha_suspencion = nueva_fecha
+                usuario_denunciante.is_active = False
+                usuario_denunciante.save()
+                denunciante.save()
+    return redirect('detalle_denuncia', id_denuncia=id_denuncia)
+
+

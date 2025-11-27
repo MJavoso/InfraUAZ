@@ -1,0 +1,16 @@
+- model: denuncias.EstadoDenuncia
+  pk: 1
+  fields:
+    estado: PENDIENTE
+- model: denuncias.EstadoDenuncia
+  pk: 2
+  fields:
+    estado: EN_PROCESO
+- model: denuncias.EstadoDenuncia
+  pk: 3
+  fields:
+    estado: RESUELTA
+- model: denuncias.EstadoDenuncia
+  pk: 4
+  fields:
+    estado: CANCELADA

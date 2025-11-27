@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block titulo %}Detalle de la Denuncia{% endblock titulo %}
+
+{% block links %}
+
+
+<link rel="stylesheet" href="{% static 'css/modal.css' %}">
+<link rel="stylesheet" href="{% static 'css/detalle_denuncia_container_4.css' %}">
+
+
+{% endblock links %}
+
+{% block contenido %}
+{% include "nav_bar.html" %}
+
+{% if messages %}
+
+<div class="container mt-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="container mt-4">
+    <a href="{% url 'muro_denuncias' %}" class="text-decoration-none text-primary d-flex align-items-center mb-3">
+        <i class="bi bi-arrow-left me-2"></i> Regresar
+    </a>
+
+<div class="d-flex justify-content-between align-items-start flex-wrap">
+    <div>
+        <h3 class="fw-bold mb-1">{{ denuncia.titulo }}</h3>
+        <div class="d-flex align-items-center">
+            {% if denuncia.id_estado.estado == "PENDIENTE" %}
+            <span class="badge bg-warning text-dark me-2 d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i> Pendiente
+            </span>
+            {% elif denuncia.id_estado.estado == "EN_PROCESO" %}
+            <span class="badge bg-info text-dark me-2">
+                <i class="bi bi-hourglass-split me-1"></i> En revisión
+            </span>
+            {% elif denuncia.id_estado.estado == "RESUELTA" %}
+            <span class="badge bg-success me-2">
+                <i class="bi bi-check-circle-fill me-1"></i> Resuelta
+            </span>
+            {% elif denuncia.id_estado.estado == "CANCELADA" %}
+            <span class="badge bg-secondary me-2">
+                <i class="bi bi-x-circle-fill me-1"></i> Cancelada
+            </span>
+            {% endif %}
+            <span class="text-muted">{{ denuncia.id_tipo_denuncia.descripcion }}</span>
+        </div>
+    </div>
+
+    {% if user.is_staff %}
+    <div class="d-flex align-items-center gap-2 ms-auto flex-wrap contenedor-botones-superior">
+
+        <form method="POST" action="{% url 'cambiar_estado_denuncia' denuncia.id_denuncia %}" class="d-inline mb-2 mb-md-0">
+            {% csrf_token %}
+            <div class="btn-group" >
+                <button type="button" class="btn btn-warning dropdown-toggle" data-bs-toggle="dropdown">
+                    {{ denuncia.id_estado.estado|title }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-center">
+                    {% for estado in estados_denuncia %}
+                    {% if estado.id_estado != denuncia.id_estado.id_estado %}
+                    <li>
+                        <button class="dropdown-item" type="submit" name="nuevo_estado" value="{{ estado.id_estado }}">
+                            {{ estado.estado|title }}
+                        </button>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </form>
+
+        <a href="#" data-bs-toggle="modal" data-bs-target="#modalDenuncia" class="btn btn-outline-danger mb-2 mb-md-0">
+            <i class="bi bi-flag-fill me-1"></i> Reportar Denuncia
+        </a>
+    </div>
+    {% endif %}
+
+    {% include 'componentes/modal_denuncia.html' with denuncia=denuncia %}
+</div>
+
+<hr class="my-4">
+
+<div class="row">
+    <div class="col-lg-8">
+
+        {% if user.is_staff %}
+        <div class="alert alert-primary d-flex align-items-start" role="alert">
+            <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+            <div>
+                <strong>Información para el Administrador</strong><br>
+                Los insumos utilizados podrán ser agregados una vez que la denuncia cambie de estado a 
+                <em>"En proceso"</em> o <em>"Resuelta"</em>.
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0 text-primary d-flex align-items-center">
+                    <i class="bi bi-file-earmark-text me-2"></i> Descripción del Incidente
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">{{ denuncia.descripcion }}</p>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0 text-primary d-flex align-items-center">
+                    <i class="bi bi-camera-fill me-2"></i> Fotografías de Evidencia
+                </h5>
+            </div>
+
+            <div class="card-body">
+                <div class="alert alert-warning" role="alert">
+                    <strong>⚠️ Disponibilidad de fotos</strong><br>
+                    Las fotografías estarán disponibles 7 diás despues de la fecha en que se hizo la denuncia:
+                    <strong>{{ denuncia.fecha_expiracion_fotos|date:"d/m/Y" }}</strong>
+                </div>
+
+                <div class="d-flex flex-wrap gap-3">
+                    {% for foto in fotos %}
+                    <div class="border border-2 border-dashed rounded d-flex flex-column align-items-center justify-content-center p-3"
+                        style="width: 160px; height: 160px; background-color: #f8f9fa;">
+                        
+                        <img src="{{ foto.uriFoto.url }}" alt="Evidencia {{ forloop.counter }}" class="img-fluid mb-2 rounded">
+                        <small>Foto {{ forloop.counter }}</small>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No se han subido fotografías para esta denuncia.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0 text-primary d-flex align-items-center">
+                    <i class="bi bi-camera-fill me-2"></i> Ubicación detallada del Incidente
+                </h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Edificio:</strong> {{ denuncia.id_lugar.id_programa.id_edificio.nombre }}</p>
+                <p><strong>Programa académico:</strong> {{ denuncia.id_lugar.id_programa.nombre_programa }}</p>
+                <p><strong>Tipo de lugar:</strong> {{ denuncia.id_lugar.id_tipo.nombre_tipo }}</p>
+                <p><strong>Lugar de referencia:</strong> {{ denuncia.id_lugar.nombre_lugar }}</p>
+            </div>
+        </div>
+
+        {% if denuncia.comentarios_admin %}
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0 text-primary d-flex align-items-center">
+                    <i class="bi bi-chat-dots me-2"></i> Comentarios del Administrador
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">{{ denuncia.comentarios_admin }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if user.is_staff %}
+        {% if denuncia.id_estado.estado == "EN_PROCESO" or denuncia.id_estado.estado == "RESUELTA" %}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <h5 class="mb-0 text-primary d-flex align-items-center">
+                    <i class="bi bi-box-seam me-2"></i> Insumos Utilizados en la Resolución
+                </h5>
+                <button id="btnEditarInsumos" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-pencil-square me-1"></i> Editar
+                </button>
+            </div>
+
+            <div class="card-body">
+                {% if insumos %}
+                <ul class="list-group mb-3">
+                    {% for insumo in insumos %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ insumo.nombre }} ({{ insumo.cantidad }})</span>
+                        <span class="text-muted">${{ insumo.costo }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted text-center">No hay insumos registrados en esta denuncia</p>
+                {% endif %}
+
+                <div id="seccionAgregarInsumos" class="border-top pt-3" style="display: none;">
+                    <h6 class="fw-bold mb-3">Agregar Nuevo Insumo</h6>
+
+                    <form method="POST" action="{% url 'agregar_insumo' denuncia.id_denuncia %}" class="d-flex flex-wrap align-items-center gap-2">
+                        {% csrf_token %}
+                        <input type="text" name="nombre" class="form-control form-control-sm" placeholder="Nombre del insumo" required>
+                        <input type="number" name="cantidad" class="form-control form-control-sm" placeholder="Cantidad" required>
+                        <input type="number" name="costo" step="0.01" class="form-control form-control-sm" placeholder="Precio por ítem" required>
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="bi bi-plus-lg"></i> Agregar
+                        </button>
+                    </form>
+
+                    <div class="text-end mt-3">
+                        <button id="btnTerminarEdicion" class="btn btn-outline-dark btn-sm">
+                            Terminar Edición
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0 text-primary d-flex align-items-center">
+                    <i class="bi bi-calendar-event me-2"></i> Fecha del Reporte
+                </h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Fecha:</strong> {{ denuncia.fecha|date:"d/m/Y" }}</p>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0 text-primary d-flex align-items-center">
+                    <i class="bi bi-geo-alt me-2"></i> Ubicación
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-1"><strong>Edificio:</strong> {{ denuncia.id_lugar.id_programa.id_edificio.nombre }}</p>
+                <p class="mb-1"><strong>Tipo de lugar:</strong> {{ denuncia.id_lugar.id_tipo.nombre_tipo }}</p>
+                <p><strong>Referencia:</strong> {{ denuncia.id_lugar.nombre_lugar }}</p>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0 text-primary d-flex align-items-center">
+                    <i class="bi bi-calendar-event me-2"></i> Reportado por:
+                </h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Nombre:</strong> {{ denuncia.id_denunciante.usuario.nombre }}</p>
+                <p><strong>Correo:</strong> {{ denuncia.id_denunciante.usuario.correo }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+</div>
+{% endblock contenido %}
+
+{% block scripts %}
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const btnEditar = document.getElementById("btnEditarInsumos");
+    const btnTerminar = document.getElementById("btnTerminarEdicion");
+    const seccion = document.getElementById("seccionAgregarInsumos");
+
+    if (btnEditar && btnTerminar && seccion) {
+        btnEditar.addEventListener("click", () => {
+            seccion.style.display = "inline";
+            btnEditar.style.display = "none";
+        });
+        btnTerminar.addEventListener("click", () => {
+            seccion.style.display = "none";
+            btnEditar.style.display = "inline-block";
+        });
+    }
+});
+</script>
+
+{% endblock scripts %}
