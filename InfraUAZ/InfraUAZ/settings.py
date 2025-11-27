@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from os import getenv, path
+import sys
 from django.urls import reverse_lazy
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -167,3 +168,6 @@ CRONJOBS = [
     ('0 0 * * *', 'denuncias.cron.borrar_fotos'),
     ('0 0 * * *', 'denuncias.cron.activar_denunciantes'),
 ]
+if 'test' in sys.argv:
+    DATABASES['default']['NAME'] = 'test_infrauaz'
+

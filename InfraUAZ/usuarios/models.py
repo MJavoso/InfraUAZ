@@ -11,8 +11,10 @@ class UsuarioManager(BaseUserManager):
         user.set_password(contrasena)
         is_staff = extra_fields.get('is_staff', False)
         if not is_staff:
-            user.is_active = False
-            user.verificado = False
+            if 'is_active' not in extra_fields:
+                user.is_active = False
+            if 'verificado' not in extra_fields:
+                user.verificado = False
         user.save(using=self._db)
         return user
     
