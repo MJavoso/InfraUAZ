@@ -66,3 +66,14 @@ class InsumosTests(TestCase):
         self.assertTrue(Insumo.objects.filter(nombre='Cinta', id_denuncia=self.denuncia).exists())
         insumo = Insumo.objects.get(nombre='Cinta', id_denuncia=self.denuncia)
         self.assertEqual(insumo.cantidad, 2)
+
+    def test_denunciante_no_puede_agregar_insumo(self):
+        url = reverse("agregar_insumo", args=[self.denuncia.id_denuncia])
+        resp = self.client.post(url, {
+            "nombre": "Cinta",
+            "cantidad": 1,
+            "costo": "10.00"
+        })
+
+        self.assertEqual(resp.status_code, 302)
+        self.assertFalse(Insumo.objects.filter(nombre="Cinta").exists())
