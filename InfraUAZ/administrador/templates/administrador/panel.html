@@ -19,9 +19,9 @@
             <h5 class="text-secondary">Gestión y seguimiento de denuncias del campus UAZ Siglo XXI</h5>
         </div>
         <div class="col-auto">
-            <a href="{% url 'reporte_denuncias_pdf' %}" class="btn btn-danger">
+            <button class="btn btn-danger" id="botonDescargarReporte">
                 <i class="bi bi-file-earmark-pdf me-1"></i> Generar reporte
-            </a>
+            </button>
         </div>
     </div>
 
@@ -100,6 +100,7 @@
                     <div class="col-md-4">
                       <input type="text" name="busqueda" id="busqueda" class="form-control" placeholder="ID, tipo, ubicación...">
                     </div>
+                    <input hidden id="edifico" name="edificio" value="{{ id_edificio }}" />
                     <div class="col-md-4">
                       <select name="estado" id="estado" class="form-select">
                         <option value="">Estados</option>
@@ -138,6 +139,7 @@
 document.addEventListener("DOMContentLoaded", function() {
   const form = document.getElementById("filtros-form");
   const tabla = document.getElementById("tabla-denuncias");
+  const botonDescargarReporte = document.getElementById("botonDescargarReporte");
 
   // Escucha cambios en cualquier campo del filtro
   form.querySelectorAll("select, input").forEach(input => {
@@ -145,11 +147,37 @@ document.addEventListener("DOMContentLoaded", function() {
     input.addEventListener("change", actualizarTabla);
   });
 
+  botonDescargarReporte.addEventListener("click", function() {
+    descargarReporte();
+  });
+
   async function actualizarTabla() {
     const params = new URLSearchParams(new FormData(form));
     const response = await fetch("{% url 'filtrar_denuncias_panel' %}?" + params.toString());
     const html = await response.text();
     tabla.innerHTML = html;
+  }
+
+  async function descargarReporte() {
+    const params = new URLSearchParams(new FormData(form));
+    const response = await fetch("{% url 'reporte_denuncias_pdf' %}?" + params.toString());
+    const blob = await response.blob();
+
+    const contentDisposition = response.headers.get('Content-Disposition');
+    const fileNameMatch = contentDisposition && contentDisposition.match(/filename="(.+)"/);
+    const fileName = fileNameMatch ? fileNameMatch[1] : 'archivo.pdf';
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
   }
 });
 </script>

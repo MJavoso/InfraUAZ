@@ -8,6 +8,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.pdfgen import canvas
 from django.http import HttpResponse
 from reportlab.lib.units import inch
+from django.db.models import Q
 # Importaciones para poner la fecha en el título PDF
 from datetime import datetime
 from io import BytesIO
@@ -82,7 +83,28 @@ def generar_reporte_denuncias_pdf(request):
     )
 
     # 🔹 Obtener denuncias
-    denuncias = Denuncia.objects.all().order_by("-fecha")
+    edificio = int(request.GET.get("edificio"))
+    
+    denuncias = Denuncia.objects.filter(
+        id_lugar__id_programa__id_edificio=edificio
+    ).order_by('-fecha')
+    
+    estado = request.GET.get("estado")
+    tipo = request.GET.get("tipo")
+    busqueda = request.GET.get("busqueda", "").strip()
+
+    # Aplicar filtros dinámicos
+    if estado:
+        denuncias = denuncias.filter(id_estado=estado)
+    if tipo:
+        denuncias = denuncias.filter(id_tipo_denuncia=tipo)
+    if busqueda:
+        denuncias = denuncias.filter(
+            Q(título__icontains=busqueda)
+            | Q(descripcion__icontains=busqueda)
+            | Q(id_lugar__nombre_lugar__icontains=busqueda)
+            | Q(id_denunciante__usuario__nombre__icontains=busqueda)
+        )
 
     # 🔹 Recorrer denuncias
     for idx, denuncia in enumerate(denuncias, start=1):
