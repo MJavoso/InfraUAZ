@@ -144,6 +144,7 @@ STATIC_ROOT = path.join(BASE_DIR, 'staticfiles/')
 MEDIA_ROOT = path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
 
+FORCE_SCRIPT_NAME = getenv('SUB_DIR')
 LOGIN_URL = reverse_lazy('login') #/usuarios/login
 LOGIN_REDIRECT_URL = reverse_lazy('muro_denuncias')
 LOGOUT_REDIRECT_URL = reverse_lazy('login')
