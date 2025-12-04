@@ -29,10 +29,11 @@ SECRET_KEY = getenv('SECRET')
 DEBUG = getenv('DEBUG_MODE') == 'True'
 
 if DEBUG:
-    ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost', 'nginx']
+    ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost', 'nginx', 'ingsoftware2.uaz.edu.mx']
     CSRF_TRUSTED_ORIGINS = [
         'http://127.0.0.1:8000',
-        'http://localhost:8000'
+        'http://localhost:8000',
+        'https://ingsoftware2.uaz.edu.mx',
     ]
     print("Debug mode is ON", flush=True)
 
@@ -143,6 +144,7 @@ STATIC_ROOT = path.join(BASE_DIR, 'staticfiles/')
 MEDIA_ROOT = path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
 
+FORCE_SCRIPT_NAME = getenv('SUB_DIR')
 LOGIN_URL = reverse_lazy('login') #/usuarios/login
 LOGIN_REDIRECT_URL = reverse_lazy('muro_denuncias')
 LOGOUT_REDIRECT_URL = reverse_lazy('login')
