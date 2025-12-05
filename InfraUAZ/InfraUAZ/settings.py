@@ -31,8 +31,8 @@ DEBUG = getenv('DEBUG_MODE') == 'True'
 ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost', 'nginx', 'ingsoftware2.uaz.edu.mx']
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
-    'http://localhost:8000'
-    'https://ingsoftware2.uaz.edu.mx'
+    'http://localhost:8000',
+    'https://ingsoftware2.uaz.edu.mx',
 ]
 
 if DEBUG:
