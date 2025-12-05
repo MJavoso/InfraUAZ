@@ -66,6 +66,7 @@ def panel_administrador(request):
         'resueltas': resueltas,
         'canceladas': canceladas,
         'edificio': edificio,
+        'id_edificio': edificio.id_edificio,
         'filtros': request.GET
     }
 
