@@ -64,14 +64,26 @@
             {% csrf_token %}
             <div class="btn-group" >
                 <button type="button" class="btn btn-warning dropdown-toggle" data-bs-toggle="dropdown">
-                    {{ denuncia.id_estado.estado|title }}
+                    {% if denuncia.id_estado.estado == "PENDIENTE" %}
+                            Pendiente
+                    {% elif denuncia.id_estado.estado == "EN_PROCESO" %}
+                            En revisión
+                    {% elif denuncia.id_estado.estado == "RESUELTA" %}
+                            Resuelta
+                    {% endif %}
                 </button>
                 <ul class="dropdown-menu dropdown-menu-center">
                     {% for estado in estados_denuncia %}
                     {% if estado.id_estado != denuncia.id_estado.id_estado %}
                     <li>
                         <button class="dropdown-item" type="submit" name="nuevo_estado" value="{{ estado.id_estado }}">
-                            {{ estado.estado|title }}
+                            {% if estado.estado == "PENDIENTE" %}
+                                    Pendiente
+                            {% elif estado.estado == "EN_PROCESO" %}
+                                    En revisión
+                            {% elif estado.estado == "RESUELTA" %}
+                                    Resuelta
+                            {% endif %}
                         </button>
                     </li>
                     {% endif %}
