@@ -20,7 +20,7 @@ class EmailStatus(Enum):
     USER_EXISTS = "user_exists"
 
 def obtener_dominio(request: HttpRequest) -> str:
-    dominio = settings.ACTIVATION_DOMAIN
+    dominio = settings.EMAIL_ACTIVATION_DOMAIN
     return dominio
 
 def es_administrador(id_usuario: int):
