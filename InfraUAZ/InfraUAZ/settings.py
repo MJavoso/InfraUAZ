@@ -28,12 +28,13 @@ SECRET_KEY = getenv('SECRET')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getenv('DEBUG_MODE') == 'True'
 
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost', 'nginx']
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:8000',
+    'http://localhost:8000'
+]
+
 if DEBUG:
-    ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost', 'nginx']
-    CSRF_TRUSTED_ORIGINS = [
-        'http://127.0.0.1:8000',
-        'http://localhost:8000'
-    ]
     print("Debug mode is ON", flush=True)
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
